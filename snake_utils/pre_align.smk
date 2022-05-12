@@ -28,9 +28,47 @@ rule all:
 
 rule apply_translations:
     input:
-        os.path.join(source_folder, "{name}")
+        os.path.join(source_folder, "{name}"),
+        os.path.join(target_folder, "cache", "final_offsets.json")
     output:
         os.path.join(target_folder, "pre_align", "{name}")
     threads: 1
     script:
         os.path.join(src_path, "amst_utils", "apply_translations.py")
+
+
+rule combine_translations:
+    input:
+        expand(
+            os.path.join(target_folder, "cache", "offsets_local", "{name}.json"),
+            name=im_names
+        ),
+        expand(
+            os.path.join(target_folder, "cache", "offsets_tm", "{name}.json"),
+            name=im_names
+        )
+    output:
+        os.path.join(target_folder, "cache", "final_offsets.json")
+    threads: 1
+    script:
+        os.path.join(src_path, "amst_utils", "combine_translations.py")
+
+
+rule template_matching:
+    input:
+        os.path.join(source_folder, "{name}")
+    output:
+        os.path.join(target_folder, "cache", "offsets_tm", "{name}.json")
+    threads: 1
+    script:
+        os.path.join(src_path, "amst_utils", "template_matching.py")
+
+
+rule local_alignment:
+    input:
+        os.path.join(source_folder, "{name}")
+    output:
+        os.path.join(target_folder, "cache", "offsets_local", "{name}.json")
+    threads: 1
+    script:
+        os.path.join(src_path, "amst_utils", "local_alignment.py")
