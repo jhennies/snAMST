@@ -1,24 +1,34 @@
 
+import sys
+sys.path.append('..')
+
+from amst_utils.common.settings import get_run_info, get_params
+from amst_utils.common.param_handling import replace_special
+
 import os
 from glob import glob
 import json
-from settings import get_run_info_fp
 
 src_path = os.getcwd()
 
 # Get the run info
-run_info_fp = get_run_info_fp()
-with open(run_info_fp, mode='r') as f:
-    run_info = json.load(f)
+run_info = get_run_info()
+params = get_params()
 
 # Parameters set by user
 source_folder = run_info['source_folder']
 target_folder = run_info['target_folder']
+im_list = run_info['im_list']
+im_names = run_info['im_names']
 verbose = run_info['verbose']
 
 # The list of image slices
-im_list = sorted(glob(os.path.join(source_folder, '*.tif')))
-im_names = [os.path.split(fp)[1] for fp in im_list]
+ref_list = [None] + im_list[:-1]
+ref_dict = dict(zip(im_list, ref_list))
+
+# Parameters which are relevant to build the snakemake workflow
+use_local = 'local' in params.keys() and params['local'] is not None
+use_tm = 'tm' in params.keys() and params['tm'] is not None
 
 
 rule all:
@@ -37,16 +47,24 @@ rule apply_translations:
         os.path.join(src_path, "amst_utils", "apply_translations.py")
 
 
+def combine_translation_inputs(wildcards):
+    inputs = []
+    if use_local:
+        inputs.extend(
+            expand(os.path.join(target_folder, "cache", "offsets_local", "{name}.json"), name=im_names)
+        )
+    elif use_tm:
+        inputs.append(
+            expand(os.path.join(target_folder, "cache", "offsets_tm", "{name}.json"), name=im_names)        )
+    else:
+        raise RuntimeError('At least local or TM alignment have to be active!')
+    print(inputs)
+    return inputs
+
+
 rule combine_translations:
     input:
-        expand(
-            os.path.join(target_folder, "cache", "offsets_local", "{name}.json"),
-            name=im_names
-        ),
-        expand(
-            os.path.join(target_folder, "cache", "offsets_tm", "{name}.json"),
-            name=im_names
-        )
+        combine_translation_inputs
     output:
         os.path.join(target_folder, "cache", "final_offsets.json")
     threads: 1
@@ -64,11 +82,19 @@ rule template_matching:
         os.path.join(src_path, "amst_utils", "template_matching.py")
 
 
+def get_ref_im(wildcards):
+    ref_im = replace_special(wildcards.name)
+    return ref_im
+
 rule local_alignment:
     input:
         os.path.join(source_folder, "{name}")
     output:
         os.path.join(target_folder, "cache", "offsets_local", "{name}.json")
     threads: 1
+    resources:
+        gpu=1 if params['local']['align_method'] == 'sift' else 0
+    params:
+        ref_im=get_ref_im
     script:
         os.path.join(src_path, "amst_utils", "local_alignment.py")
