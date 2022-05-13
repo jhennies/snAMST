@@ -24,7 +24,7 @@ verbose = run_info['verbose']
 
 # The list of image slices
 ref_list = [None] + im_list[:-1]
-ref_dict = dict(zip(im_list, ref_list))
+ref_dict = dict(zip(im_names, ref_list))
 
 # Parameters which are relevant to build the snakemake workflow
 use_local = 'local' in params.keys() and params['local'] is not None
@@ -83,7 +83,7 @@ rule template_matching:
 
 
 def get_ref_im(wildcards):
-    ref_im = replace_special(wildcards.name)
+    ref_im = replace_special(ref_dict[wildcards.name])
     return ref_im
 
 rule local_alignment:
@@ -93,7 +93,7 @@ rule local_alignment:
         os.path.join(target_folder, "cache", "offsets_local", "{name}.json")
     threads: 1
     resources:
-        gpu=1 if params['local']['align_method'] == 'sift' else 0
+        gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0
     params:
         ref_im=get_ref_im
     script:

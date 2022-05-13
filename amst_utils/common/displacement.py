@@ -49,7 +49,7 @@ def compute_auto_pad(offsets, bounds):
     # Prepare the displacements respective all bounds and figure out the target shape
     offsets_ = []
     for idx, b in enumerate(bounds):
-        offsets_.append(np.array((offsets[idx][0] + b[0], offsets[idx][1] + b[1])))
+        offsets_.append(np.array((offsets[idx][0] + b[1], offsets[idx][1] + b[0])))
     offsets = offsets_
     offsets = offsets - np.min(offsets, axis=0)
     starts = []
@@ -106,4 +106,16 @@ def displace_slice(
 
     # Write result
     imwrite(target_fp, im.astype(im.dtype), compression=compression)
+
+
+def sequentialize_offsets(offsets):
+
+    seq_offset = offsets[0]
+    seq_offsets = [seq_offset.copy()]
+
+    for offset in offsets[1:]:
+        seq_offset += np.array(offset)
+        seq_offsets.append(seq_offset.copy())
+
+    return np.array(seq_offsets)
 

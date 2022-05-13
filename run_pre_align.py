@@ -9,6 +9,10 @@ def run_pre_align(
         source_folder,
         target_folder,
         local_align_method=None,
+        local_mask_range=None,
+        local_sigma=1.6,
+        local_norm_quantiles=(0.1, 0.9),
+        local_device_type='GPU',
         combine_median=8,
         combine_sigma=8.,
         auto_pad=False,
@@ -47,7 +51,11 @@ def run_pre_align(
                 source_folder=source_folder,
                 target_folder=target_folder,
                 local=None if local_align_method is None else dict(
-                    align_method=local_align_method
+                    align_method=local_align_method,
+                    mask_range=local_mask_range,
+                    sigma=local_sigma,
+                    norm_quantiles=local_norm_quantiles,
+                    device_type=local_device_type
                 ),
                 combine_median=combine_median,
                 combine_sigma=combine_sigma,
@@ -77,6 +85,15 @@ if __name__ == '__main__':
                         help='The output folder')
     parser.add_argument('-lam', '--local_align_method', type=str, default=None,
                         help='Method for local alignment: "sift", "xcorr", or "none"')
+    parser.add_argument('-lmr', '--local_mask_range', type=float, nargs=2, default=None,
+                        metavar=('lower', 'upper'),
+                        help='Similar to threshold, except values above the upper threshold are set to zero')
+    parser.add_argument('-lsg', '--local_sigma', type=float, default=1.6,
+                        help='Smooths the data before local alignment')
+    parser.add_argument('-lnq', '--local_norm_quantiles', type=float, nargs=2, default=(0.1, 0.9),
+                        help='For SIFT: Histogram quantiles for normalization of the data. Default=(0.1, 0.9)')
+    parser.add_argument('-ldt', '--local_device_type', type=str, default='GPU',
+                        help='For SIFT: either GPU or CPU')
     parser.add_argument('-cm', '--combine_median', type=int, default=8,
                         help='Median smoothing of offsets when combining local and TM')
     parser.add_argument('-cs', '--combine_sigma', type=float, default=8.,
@@ -91,12 +108,18 @@ if __name__ == '__main__':
                         help='Number of cores to use')
     parser.add_argument('-g', '--gpu', type=int, default=1,
                         help='Number of available GPUs')
+    parser.add_argument('--unlock', action='store_true',
+                        help='Unlock snakemake directory')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     args = parser.parse_args()
     source_folder = args.source_folder
     target_folder = args.target_folder
     local_align_method = args.local_align_method
+    local_mask_range = args.local_mask_range
+    local_sigma = args.local_sigma
+    local_norm_quantiles = args.local_norm_quantiles
+    local_device_type = args.local_device_type
     combine_median = args.combine_median
     combine_sigma = args.combine_sigma
     auto_pad = args.auto_pad
@@ -104,6 +127,7 @@ if __name__ == '__main__':
     dryrun = args.dryrun
     cores = args.cores
     gpu = args.gpu
+    unlock = args.unlock
     verbose = args.verbose
 
     if local_align_method == 'none':
@@ -113,6 +137,10 @@ if __name__ == '__main__':
         source_folder,
         target_folder,
         local_align_method=local_align_method,
+        local_mask_range=local_mask_range,
+        local_sigma=local_sigma,
+        local_norm_quantiles=local_norm_quantiles,
+        local_device_type=local_device_type,
         combine_median=combine_median,
         combine_sigma=combine_sigma,
         auto_pad=auto_pad,
@@ -122,7 +150,8 @@ if __name__ == '__main__':
                 'gpu': gpu
             },
             dryrun=dryrun,
-            cores=cores
+            cores=cores,
+            unlock=unlock
         ),
         verbose=verbose
     )

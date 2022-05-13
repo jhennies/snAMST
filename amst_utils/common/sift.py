@@ -4,6 +4,8 @@ import numpy as np
 from silx.image import sift
 from .data import get_bounds
 
+from amst_utils.common.slice_pre_processing import preprocess_slice
+
 
 def _norm_8bit(im, quantiles):
     im = im.astype('float32')
@@ -80,6 +82,10 @@ def _sift(
 
 def offset_with_sift(
         im_fp, ref_im_fp,
+        mask_range=None,
+        sigma=1.6,
+        norm_quantiles=(0.1, 0.9),
+        device_type='GPU',
         return_bounds=False,
         verbose=False
 ):
@@ -87,14 +93,18 @@ def offset_with_sift(
     im = imread(im_fp)
     ref_im = imread(ref_im_fp)
 
+    im = preprocess_slice(im, sigma=sigma, mask_range=mask_range)
+    ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range)
+
     offsets = _sift(
         im, ref_im,
-        devicetype='GPU',
-        norm_quantiles=(0.1, 0.9),
+        devicetype=device_type,
+        norm_quantiles=norm_quantiles,
         verbose=verbose
     )
+    offsets = -np.array(offsets)
 
     if return_bounds:
-        return offsets, get_bounds(im)
+        return offsets.tolist(), get_bounds(im)
     else:
-        return offsets
+        return offsets.tolist()

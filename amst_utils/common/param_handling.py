@@ -6,6 +6,9 @@ REPLACE_CHARS = [
 
 def replace_special(inp, back=False):
 
+    if inp is None:
+        return inp
+
     for rpl in REPLACE_CHARS:
         if not back:
             inp = inp.replace(rpl[0], rpl[1])

@@ -21,8 +21,8 @@ def apply_translations(
         im_list = data['im_list']
         idx = im_list.index(im_fp)
         offset = data['offsets'][idx]
-        bounds = data['bounds'][idx]
-        shape = data['shape']
+        bounds = None if data['bounds'] is None else data['bounds'][idx]
+        shape = None if data['shape'] is None else data['shape']
         del data
 
     if verbose:
@@ -32,7 +32,8 @@ def apply_translations(
         print(f'bounds = {bounds}')
         print(f'shape = {shape}')
 
-    bounds = bounds2slice(bounds)
+    if bounds is not None:
+        bounds = bounds2slice(bounds)
 
     displace_slice(
         result_fp, im_fp, offset, subpx_displacement=True,

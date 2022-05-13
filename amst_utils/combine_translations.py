@@ -2,9 +2,10 @@ import os.path
 
 from tifffile import imread
 import json
+import numpy as np
 
 from amst_utils.common.settings import get_params, get_run_info
-from amst_utils.common.displacement import smooth_offsets, compute_auto_pad
+from amst_utils.common.displacement import smooth_offsets, compute_auto_pad, sequentialize_offsets
 
 
 def combine_translations(
@@ -23,16 +24,19 @@ def combine_translations(
     tm_offsets = None
     bounds = None
     if local_offsets_fps is not None:
-        local_offsets = [json.load(open(fp, mode='r'))['offset'] for fp in local_offsets_fps]
+        local_offsets = np.array([json.load(open(fp, mode='r'))['offset'] for fp in local_offsets_fps])
     if tm_offsets_fps is not None:
-        tm_offsets = [json.load(open(fp, mode='r'))['offset'] for fp in tm_offsets_fps]
+        tm_offsets = np.array([json.load(open(fp, mode='r'))['offset'] for fp in tm_offsets_fps])
     if bounds_fps is not None:
-        bounds = [json.load(open(fp, mode='r'))['bounds'] for fp in bounds_fps]
+        bounds = np.array([json.load(open(fp, mode='r'))['bounds'] for fp in bounds_fps])
 
     if verbose:
         print(f'local_offsets = {local_offsets}')
         print(f'tm_offsets = {tm_offsets}')
         print(f'bounds = {bounds}')
+
+    if local_offsets is not None:
+        local_offsets = sequentialize_offsets(local_offsets)
 
     if local_offsets is not None and tm_offsets is not None:
 
@@ -62,7 +66,7 @@ def combine_translations(
             dict(
                 im_list=im_list,
                 offsets=offsets.tolist(),
-                bounds=None if bounds is None else bounds,
+                bounds=None if bounds is None else bounds.tolist(),
                 shape=None if shape is None else shape.tolist()
             ), f, indent=2
         )
@@ -87,17 +91,17 @@ if __name__ == '__main__':
     use_tm = 'tm' in params.keys() and params['tm'] is not None
     bounds_fps = None
     if use_local and use_tm:
-        local_offsets_fps = inputs[:int(len(inputs) / 2)]
-        tm_offsets_fps = inputs[int(len(inputs) / 2):]
+        local_offsets_fps = sorted(inputs[:int(len(inputs) / 2)])
+        tm_offsets_fps = sorted(inputs[int(len(inputs) / 2):])
         if auto_pad:
             bounds_fps = local_offsets_fps
     elif use_local and not use_tm:
-        local_offsets_fps = inputs
+        local_offsets_fps = sorted(inputs)
         if auto_pad:
             bounds_fps = local_offsets_fps
         tm_offsets_fps = None
     elif not use_local and use_tm:
-        tm_offsets_fps = inputs
+        tm_offsets_fps = sorted(inputs)
         if auto_pad:
             bounds_fps = tm_offsets_fps
         local_offsets_fps = None
