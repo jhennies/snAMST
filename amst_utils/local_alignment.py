@@ -47,7 +47,7 @@ def local_alignment(
             offset, bounds = out if save_bounds else (out, None)
 
         elif align_method == 'xcorr':
-            raise NotImplementedError()
+            raise NotImplementedError(f'Cross-correlation is not yet implemented!')
         else:
             raise ValueError(f'Unknown alignment method: {align_method}')
 

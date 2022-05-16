@@ -29,6 +29,9 @@ ref_dict = dict(zip(im_names, ref_list))
 # Parameters which are relevant to build the snakemake workflow
 use_local = 'local' in params.keys() and params['local'] is not None
 use_tm = 'tm' in params.keys() and params['tm'] is not None
+print(f'params["tm"] = {params["tm"]}')
+print(f'use_tm = {use_tm}')
+print(f'use_local = {use_local}')
 
 
 rule all:
@@ -53,11 +56,10 @@ def combine_translation_inputs(wildcards):
         inputs.extend(
             expand(os.path.join(target_folder, "cache", "offsets_local", "{name}.json"), name=im_names)
         )
-    elif use_tm:
-        inputs.append(
-            expand(os.path.join(target_folder, "cache", "offsets_tm", "{name}.json"), name=im_names)        )
-    else:
-        raise RuntimeError('At least local or TM alignment have to be active!')
+    if use_tm:
+        inputs.extend(
+            expand(os.path.join(target_folder, "cache", "offsets_tm", "{name}.json"), name=im_names)
+        )
     print(inputs)
     return inputs
 
@@ -72,29 +74,31 @@ rule combine_translations:
         os.path.join(src_path, "amst_utils", "combine_translations.py")
 
 
-rule template_matching:
-    input:
-        os.path.join(source_folder, "{name}")
-    output:
-        os.path.join(target_folder, "cache", "offsets_tm", "{name}.json")
-    threads: 1
-    script:
-        os.path.join(src_path, "amst_utils", "template_matching.py")
+if use_tm:
+    rule template_matching:
+        input:
+            os.path.join(source_folder, "{name}")
+        output:
+            os.path.join(target_folder, "cache", "offsets_tm", "{name}.json")
+        threads: 1
+        script:
+            os.path.join(src_path, "amst_utils", "template_matching.py")
 
 
 def get_ref_im(wildcards):
     ref_im = replace_special(ref_dict[wildcards.name])
     return ref_im
 
-rule local_alignment:
-    input:
-        os.path.join(source_folder, "{name}")
-    output:
-        os.path.join(target_folder, "cache", "offsets_local", "{name}.json")
-    threads: 1
-    resources:
-        gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0
-    params:
-        ref_im=get_ref_im
-    script:
-        os.path.join(src_path, "amst_utils", "local_alignment.py")
+if use_local:
+    rule local_alignment:
+        input:
+            os.path.join(source_folder, "{name}")
+        output:
+            os.path.join(target_folder, "cache", "offsets_local", "{name}.json")
+        threads: 1
+        resources:
+            gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0
+        params:
+            ref_im=get_ref_im
+        script:
+            os.path.join(src_path, "amst_utils", "local_alignment.py")

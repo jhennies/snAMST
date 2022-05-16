@@ -13,6 +13,10 @@ def run_pre_align(
         local_sigma=1.6,
         local_norm_quantiles=(0.1, 0.9),
         local_device_type='GPU',
+        template=None,
+        tm_threshold=(0, 0),
+        tm_sigma=0.,
+        tm_add_offset=None,
         combine_median=8,
         combine_sigma=8.,
         auto_pad=False,
@@ -57,6 +61,12 @@ def run_pre_align(
                     norm_quantiles=local_norm_quantiles,
                     device_type=local_device_type
                 ),
+                tm=None if template is None else dict(
+                    template=template,
+                    threshold=tm_threshold,
+                    sigma=tm_sigma,
+                    add_offset=tm_add_offset
+                ),
                 combine_median=combine_median,
                 combine_sigma=combine_sigma,
                 auto_pad=auto_pad,
@@ -94,6 +104,16 @@ if __name__ == '__main__':
                         help='For SIFT: Histogram quantiles for normalization of the data. Default=(0.1, 0.9)')
     parser.add_argument('-ldt', '--local_device_type', type=str, default='GPU',
                         help='For SIFT: either GPU or CPU')
+    parser.add_argument('-tm', '--template', type=str,
+                        help='Location of template tiff image. Enables template matching step if set')
+    parser.add_argument('-tmt', '--tm_threshold', type=float, nargs=2, default=[0, 0],
+                        metavar=('lower', 'upper'),
+                        help='Lower and upper thresholds applied before template matching')
+    parser.add_argument('-tms', '--tm_sigma', type=float, default=0.,
+                        help='Smooths the data before template matching alignment')
+    parser.add_argument('-tmo', '--tm_add_offset', type=int, nargs=2, default=None,
+                        metavar=('X', 'Y'),
+                        help='Add an offset to the final alignment')
     parser.add_argument('-cm', '--combine_median', type=int, default=8,
                         help='Median smoothing of offsets when combining local and TM')
     parser.add_argument('-cs', '--combine_sigma', type=float, default=8.,
@@ -120,6 +140,10 @@ if __name__ == '__main__':
     local_sigma = args.local_sigma
     local_norm_quantiles = args.local_norm_quantiles
     local_device_type = args.local_device_type
+    template = args.template
+    tm_threshold = args.tm_threshold
+    tm_sigma = args.tm_sigma
+    tm_add_offset = args.tm_add_offset
     combine_median = args.combine_median
     combine_sigma = args.combine_sigma
     auto_pad = args.auto_pad
@@ -141,6 +165,10 @@ if __name__ == '__main__':
         local_sigma=local_sigma,
         local_norm_quantiles=local_norm_quantiles,
         local_device_type=local_device_type,
+        template=template,
+        tm_threshold=tm_threshold,
+        tm_sigma=tm_sigma,
+        tm_add_offset=tm_add_offset,
         combine_median=combine_median,
         combine_sigma=combine_sigma,
         auto_pad=auto_pad,
