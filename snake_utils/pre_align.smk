@@ -39,6 +39,8 @@ if verbose:
 rule all:
     input:
         expand(os.path.join(target_folder, "pre_align", "{name}"), name=im_names)
+    params:
+        p='htc', gres=''
 
 
 rule apply_translations:
@@ -48,6 +50,8 @@ rule apply_translations:
     output:
         os.path.join(target_folder, "pre_align", "{name}")
     threads: 1
+    params:
+        p='htc', gres=''
     script:
         os.path.join(src_path, "amst_utils", "apply_translations.py")
 
@@ -72,6 +76,8 @@ rule combine_translations:
     output:
         os.path.join(target_folder, "pre_align_cache", "final_offsets.json")
     threads: 1
+    params:
+        p='htc', gres=''
     script:
         os.path.join(src_path, "amst_utils", "combine_translations.py")
 
@@ -83,6 +89,8 @@ if use_tm:
         output:
             os.path.join(target_folder, "pre_align_cache", "offsets_tm", "{name}.json")
         threads: 1
+        params:
+            p='htc', gres=''
         script:
             os.path.join(src_path, "amst_utils", "template_matching.py")
 
@@ -101,6 +109,8 @@ if use_local:
         resources:
             gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0
         params:
-            ref_im=get_ref_im
+            ref_im=get_ref_im,
+            p='gpu' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 'htc'
+            gres='--gres=gpu:1' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else ''
         script:
             os.path.join(src_path, "amst_utils", "local_alignment.py")
