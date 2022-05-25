@@ -94,6 +94,7 @@ def run_pre_align(
             snake_kwargs['cluster_config'] = 'cluster/slurm/config.yaml'
             snake_kwargs['nodes'] = cores
             snake_kwargs['restart_times'] = 1
+            snake_kwargs['latency_wait'] = 5
         else:
             raise RuntimeError(f'Not supporting cluster = {cluster}')
 
