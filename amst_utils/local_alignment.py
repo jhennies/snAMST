@@ -20,6 +20,7 @@ def local_alignment(
         norm_quantiles=(0.1, 0.9),
         device_type='GPU',
         save_bounds=False,
+        auto_mask=None,
         verbose=False
 ):
 
@@ -40,6 +41,7 @@ def local_alignment(
                 norm_quantiles=norm_quantiles,
                 device_type=device_type,
                 return_bounds=save_bounds,
+                auto_mask=auto_mask,
                 verbose=verbose
             )
             if verbose:
@@ -87,6 +89,7 @@ if __name__ == '__main__':
     local_sigma = params['local']['sigma']
     local_norm_quantiles = params['local']['norm_quantiles']
     local_device_type = params['local']['device_type']
+    local_auto_mask = params['local']['auto_mask']
     auto_pad = params['auto_pad']
     verbose = params['verbose']
 
@@ -104,5 +107,6 @@ if __name__ == '__main__':
         norm_quantiles=local_norm_quantiles,
         device_type=local_device_type,
         save_bounds=auto_pad,
+        auto_mask=local_auto_mask,
         verbose=verbose
     )

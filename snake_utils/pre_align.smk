@@ -22,7 +22,7 @@ im_list = run_info['im_list']
 im_names = run_info['im_names']
 verbose = run_info['verbose']
 
-# The list of image slices
+# The list of reference image slices
 ref_list = [None] + im_list[:-1]
 ref_dict = dict(zip(im_names, ref_list))
 
@@ -42,7 +42,7 @@ rule all:
 rule apply_translations:
     input:
         os.path.join(source_folder, "{name}"),
-        os.path.join(target_folder, "cache", "final_offsets.json")
+        os.path.join(target_folder, "pre_align_cache", "final_offsets.json")
     output:
         os.path.join(target_folder, "pre_align", "{name}")
     threads: 1
@@ -54,11 +54,11 @@ def combine_translation_inputs(wildcards):
     inputs = []
     if use_local:
         inputs.extend(
-            expand(os.path.join(target_folder, "cache", "offsets_local", "{name}.json"), name=im_names)
+            expand(os.path.join(target_folder, "pre_align_cache", "offsets_local", "{name}.json"), name=im_names)
         )
     if use_tm:
         inputs.extend(
-            expand(os.path.join(target_folder, "cache", "offsets_tm", "{name}.json"), name=im_names)
+            expand(os.path.join(target_folder, "pre_align_cache", "offsets_tm", "{name}.json"), name=im_names)
         )
     print(inputs)
     return inputs
@@ -68,7 +68,7 @@ rule combine_translations:
     input:
         combine_translation_inputs
     output:
-        os.path.join(target_folder, "cache", "final_offsets.json")
+        os.path.join(target_folder, "pre_align_cache", "final_offsets.json")
     threads: 1
     script:
         os.path.join(src_path, "amst_utils", "combine_translations.py")
@@ -79,7 +79,7 @@ if use_tm:
         input:
             os.path.join(source_folder, "{name}")
         output:
-            os.path.join(target_folder, "cache", "offsets_tm", "{name}.json")
+            os.path.join(target_folder, "pre_align_cache", "offsets_tm", "{name}.json")
         threads: 1
         script:
             os.path.join(src_path, "amst_utils", "template_matching.py")
@@ -94,7 +94,7 @@ if use_local:
         input:
             os.path.join(source_folder, "{name}")
         output:
-            os.path.join(target_folder, "cache", "offsets_local", "{name}.json")
+            os.path.join(target_folder, "pre_align_cache", "offsets_local", "{name}.json")
         threads: 1
         resources:
             gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0
