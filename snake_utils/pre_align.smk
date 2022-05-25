@@ -50,6 +50,8 @@ rule apply_translations:
     output:
         os.path.join(target_folder, "pre_align", "{name}")
     threads: 1
+    resources:
+        cpus=1, time_min=10, mem_mb=512
     params:
         p='htc', gres=''
     script:
@@ -76,6 +78,8 @@ rule combine_translations:
     output:
         os.path.join(target_folder, "pre_align_cache", "final_offsets.json")
     threads: 1
+    resources:
+        cpus=1, time_min=10, mem_mb=512
     params:
         p='htc', gres=''
     script:
@@ -89,6 +93,8 @@ if use_tm:
         output:
             os.path.join(target_folder, "pre_align_cache", "offsets_tm", "{name}.json")
         threads: 1
+        resources:
+            cpus=1, time_min=10, mem_mb=512
         params:
             p='htc', gres=''
         script:
@@ -107,7 +113,8 @@ if use_local:
             os.path.join(target_folder, "pre_align_cache", "offsets_local", "{name}.json")
         threads: 1
         resources:
-            gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0
+            gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0,
+            cpus=1, time_min=10, mem_mb=512
         params:
             ref_im=get_ref_im,
             p='gpu' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 'htc',
