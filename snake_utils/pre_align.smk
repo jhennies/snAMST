@@ -32,6 +32,8 @@ use_tm = 'tm' in params.keys() and params['tm'] is not None
 print(f'params["tm"] = {params["tm"]}')
 print(f'use_tm = {use_tm}')
 print(f'use_local = {use_local}')
+if verbose:
+print(f'im_names = {im_names}')
 
 
 rule all:
