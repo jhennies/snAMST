@@ -22,7 +22,9 @@ def run_pre_align(
         combine_sigma=8.,
         auto_pad=False,
         align_params=None,
+        batch_size=1,
         snake_kwargs=None,
+        cluster=None,
         verbose=False
 ):
 
@@ -45,6 +47,7 @@ def run_pre_align(
             params_fp=align_params if align_params is not None else get_params_fp(folder=os.path.join(target_folder, 'pre_align_cache')),
             im_list=im_list,
             im_names=im_names,
+            batch_size=batch_size,
             verbose=verbose
         )
     )
@@ -76,10 +79,34 @@ def run_pre_align(
             )
         )
 
+    # Add the cluster profile
+    if cluster is not None:
+        if cluster == 'slurm':
+            snake_kwargs['cluster'] = (
+                "sbatch "
+                "-p {params.p} {params.gres} "
+                "-t {resources.time_min} "
+                "--mem={resources.mem_mb} "
+                "-c {resources.cpus} "
+                "-o log/{rule}_{wildcards}d.%N.%j.out "
+                "-e log/{rule}_{wildcards}d.%N.%j.err "
+            )
+            snake_kwargs['cluster_config'] = 'cluster/slurm/config.yaml'
+            snake_kwargs['nodes'] = cores
+            snake_kwargs['restart_times'] = 1
+        else:
+            raise RuntimeError(f'Not supporting cluster = {cluster}')
+
     # Call the snakemake workflow
-    snakemake.snakemake(
-        os.path.join('snake_utils', 'pre_align.smk'), **snake_kwargs
-    )
+    if batch_size == 1:
+        snakemake.snakemake(
+            os.path.join('snake_utils', 'pre_align.smk'), **snake_kwargs
+        )
+    else:
+        raise NotImplementedError()
+        snakemake.snakemake(
+            os.path.join('snake_utils', 'pre_align_batch.smk'), **snake_kwargs
+        )
 
 
 if __name__ == '__main__':
@@ -134,6 +161,9 @@ if __name__ == '__main__':
                         help='Number of available GPUs')
     parser.add_argument('--unlock', action='store_true',
                         help='Unlock snakemake directory')
+    parser.add_argument('--cluster', type=str, default=None,
+                        help='Enables cluster support. '
+                             'Currently only None for local computation and "slurm" is supported')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     args = parser.parse_args()
@@ -157,6 +187,7 @@ if __name__ == '__main__':
     cores = args.cores
     gpu = args.gpu
     unlock = args.unlock
+    cluster = args.cluster
     verbose = args.verbose
 
     if local_align_method == 'none':
@@ -187,6 +218,7 @@ if __name__ == '__main__':
             cores=cores,
             unlock=unlock
         ),
+        cluster=cluster,
         verbose=verbose
     )
 
