@@ -36,7 +36,7 @@ def run_pre_align(
         verbose = params['verbose']
 
     # Parse the source folder
-    im_list = sorted(glob(os.path.join(source_folder, '*.tif')))[100:124]
+    im_list = sorted(glob(os.path.join(source_folder, '*.tif')))
     im_names = [os.path.split(fp)[1] for fp in im_list]
 
     # Make run_info
