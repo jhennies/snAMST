@@ -133,7 +133,7 @@ if __name__ == '__main__':
                         help='For SIFT: Histogram quantiles for normalization of the data. Default=(0.1, 0.9)')
     parser.add_argument('-ldt', '--local_device_type', type=str, default='GPU',
                         help='For SIFT: either GPU or CPU')
-    parser.add_argument('-lau' '--local_auto_mask', type=int, default=None,
+    parser.add_argument('-lau', '--local_auto_mask', type=int, default=None,
                         help='Generates a mask by eroding the non-zero data by the specified amount')
     parser.add_argument('-tm', '--template', type=str,
                         help='Location of template tiff image. Enables template matching step if set')
