@@ -110,7 +110,7 @@ if use_local:
             gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0
         params:
             ref_im=get_ref_im,
-            p='gpu' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 'htc'
+            p='gpu' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 'htc',
             gres='--gres=gpu:1' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else ''
         script:
             os.path.join(src_path, "amst_utils", "local_alignment.py")
