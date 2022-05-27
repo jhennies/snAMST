@@ -80,6 +80,10 @@ def run_pre_align(
         )
 
     # Add the cluster profile
+    log_dir = os.path.join(target_folder, 'log')
+    if verbose:
+        print(f'log_dir = {log_dir}')
+    os.mkdir(log_dir)
     if cluster is not None:
         if cluster == 'slurm':
             snake_kwargs['cluster'] = (
@@ -88,10 +92,10 @@ def run_pre_align(
                 "-t {resources.time_min} "
                 "--mem={resources.mem_mb} "
                 "-c {resources.cpus} "
-                "-o log/{rule}_{wildcards}d.%N.%j.out "
-                "-e log/{rule}_{wildcards}d.%N.%j.err "
+                "-o " + log_dir + "/{rule}_{wildcards}d.%N.%j.out "
+                "-e " + log_dir + "/{rule}_{wildcards}d.%N.%j.err "
             )
-            snake_kwargs['cluster_config'] = 'cluster/slurm/config.yaml'
+            # snake_kwargs['cluster_config'] = 'cluster/slurm/config.yaml'
             snake_kwargs['nodes'] = cores
             snake_kwargs['restart_times'] = 1
             snake_kwargs['latency_wait'] = 5
@@ -99,9 +103,10 @@ def run_pre_align(
             raise RuntimeError(f'Not supporting cluster = {cluster}')
 
     # Call the snakemake workflow
+    script_path = os.path.realpath(os.path.dirname(__file__))
     if batch_size == 1:
         snakemake.snakemake(
-            os.path.join('snake_utils', 'pre_align.smk'), **snake_kwargs
+            os.path.join(script_path, 'snake_utils', 'pre_align.smk'), **snake_kwargs
         )
     else:
         raise NotImplementedError()
