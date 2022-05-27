@@ -130,3 +130,5 @@ dmypy.json
 
 # Specifics to this project
 tmp/
+.snakemake/
+log/
