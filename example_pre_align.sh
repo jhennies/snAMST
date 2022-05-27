@@ -4,8 +4,8 @@
 # PARAMETERS
 
 # Data
-source_folder=/g/icem/hennies/datasets/steyer_Instruments_Crossbeam_Volume-imaging/2022-02-16_PF_as43a_Acantharia/Original/Images_no_defects/
-target_folder=/scratch/hennies/tmp/snamst_test/
+source_folder=/scratch/path/to/source/
+target_folder=/scratch/path/to/results/
 
 # Workflow parameters
 local_auto_mask=10
