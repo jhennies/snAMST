@@ -198,6 +198,10 @@ if __name__ == '__main__':
 
     if local_align_method == 'none':
         local_align_method = None
+    if cluster == 'none':
+        cluster = None
+    if cores == 0:
+        cores = os.cpu_count()
 
     run_pre_align(
         source_folder,

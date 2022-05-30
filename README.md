@@ -14,7 +14,7 @@ To make the GPU accessible
 
 Alternatively, for CPU computation of the SIFT
 
-    conda install -c conda-forge ocl-pocl
+    conda install -c conda-forge pocl
 
 Adding snakemake
 
