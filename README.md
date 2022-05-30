@@ -24,7 +24,7 @@ Adding snakemake
 
 ### On the cluster (recommended)
 
-For the following change the path name as intended.
+For the following description, change the path names as required.
 
 Log in to a cluster node
 
