@@ -19,3 +19,68 @@ Alternatively, for CPU computation of the SIFT
 Adding snakemake
 
     conda install -c conda-forge -c bioconda snakemake
+
+## Usage
+
+### On the cluster (recommended)
+
+For the following change the path name as intended.
+
+Log in to a cluster node
+
+    ssh user@login-gui02.cluster.embl.de
+
+Your input data should sit on the scratch:
+
+    mkdir /scratch/my_name/
+    cp -r /g/share_name/path/to/my/dataset_name /scratch/my_name/
+
+Copy the script ```example_pre_align.sh``` to a folder where you keep your run scripts or your results folder
+and give it a more specific name. 
+For example using:
+
+    cp example_pre_align.sh /path/to/my/scripts/pre_align_dataset_name.sh
+
+Now edit the copied script with the editor or your choice, for example
+
+    cd /path/to/my/scripts
+    vim example_pre_align.sh
+
+such that it points to the correct locations:
+
+    #############################################################
+    # PARAMETERS
+    
+    # Data
+    source_folder=/scratch/my_name/dataset_name
+    target_folder=/scratch/my_name/dataset_aligned
+    
+    # Workflow parameters
+    local_auto_mask=10      # Automatically remove SIFT key-points which are at the edge of the actual (non-zero) data
+
+Increase the number of cores if you are impatient ;) Currently it is way more efficient to use many cores on the HTC as
+rather than using GPU support and lesser threads
+
+    # Compute settings
+    local_device_type=CPU   # CPU is currently more efficient for the cluster
+    cores=128               # Set to 0 for running locally with all cores, otherwise specify a value > 0
+    gpus=1                  # Has no effect if local_device_type=CPU
+    cluster=slurm           # Can be "none" or "slurm"
+
+The installation settings should point to the correct locations
+
+    # Installation settings (normally don't change anything here)
+    conda_path=/g/icem/hennies/software/miniconda3
+    env_path=/g/icem/hennies/envs
+    src_path=/g/icem/hennies/src/github/jhennies/snamst
+    
+    #############################################################
+
+When done save and exit the editor.
+
+Now just start the script with pre_align_dataset_name.sh. The entire cluster support is handled automatically. 
+
+When done the results can be copied back to your group share 
+
+    cp -r /scratch/my_name/dataset_aligned /g/share_name/path/to/my/project
+
