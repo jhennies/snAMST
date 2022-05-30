@@ -26,9 +26,7 @@ Adding snakemake
 
 For the following description, change the path names as required.
 
-Log in to a cluster node
-
-    ssh user@login-gui02.cluster.embl.de
+Log in to a cluster node.
 
 Your input data should sit on the scratch:
 
