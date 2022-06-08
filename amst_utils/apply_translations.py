@@ -36,7 +36,7 @@ def apply_translations(
         bounds = bounds2slice(bounds)
 
     displace_slice(
-        result_fp, im_fp, ofmfset, subpx_displacement=True,
+        result_fp, im_fp, offset, subpx_displacement=True,
         compression=['zlib', 9], pad_zeros=16, bounds=bounds if bounds is not None else np.s_[:],
         target_shape=shape
     )
