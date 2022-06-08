@@ -1,12 +1,16 @@
 
 import os
 import json
+import getpass
 
 
 def get_run_info_fp():
-    if not os.path.exists('tmp'):
-        os.mkdir('tmp')
-    return os.path.join('tmp', 'run_info.json')
+    path = os.path.join(
+        '/home', getpass.getuser(), '.tmp'
+    )
+    if not os.path.exists(path):
+        os.mkdir(path)
+    return os.path.join(path, 'run_info.json')
 
 
 def get_run_info():
