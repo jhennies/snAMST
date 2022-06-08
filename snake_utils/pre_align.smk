@@ -9,8 +9,6 @@ import os
 from glob import glob
 import json
 
-src_path = os.getcwd()
-
 # Get the run info
 run_info = get_run_info()
 params = get_params()
@@ -55,7 +53,7 @@ rule apply_translations:
     params:
         p='htc', gres=''
     script:
-        os.path.join(src_path, "amst_utils", "apply_translations.py")
+        os.path.join("..", "amst_utils", "apply_translations.py")
 
 
 def combine_translation_inputs(wildcards):
@@ -83,7 +81,7 @@ rule combine_translations:
     params:
         p='htc', gres=''
     script:
-        os.path.join(src_path, "amst_utils", "combine_translations.py")
+        os.path.join("..", "amst_utils", "combine_translations.py")
 
 
 if use_tm:
@@ -98,7 +96,7 @@ if use_tm:
         params:
             p='htc', gres=''
         script:
-            os.path.join(src_path, "amst_utils", "template_matching.py")
+            os.path.join("..", "amst_utils", "template_matching.py")
 
 
 def get_ref_im(wildcards):
@@ -120,4 +118,4 @@ if use_local:
             p='gpu' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 'htc',
             gres='--gres=gpu:1' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else ''
         script:
-            os.path.join(src_path, "amst_utils", "local_alignment.py")
+            os.path.join("..", "amst_utils", "local_alignment.py")

@@ -34,8 +34,6 @@ source "${conda_path}/bin/activate" "${env_path}"
 
 which python
 
-cd
-
 python ${src_path}/run_pre_align.py \
 -sf $source_folder \
 -tf $target_folder \
