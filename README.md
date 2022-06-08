@@ -24,11 +24,9 @@ Adding snakemake
 
 ### On the cluster (recommended)
 
-For the following change the path name as intended.
+For the following description, change the path names as required.
 
-Log in to a cluster node
-
-    ssh user@login-gui02.cluster.embl.de
+Log in to a cluster node.
 
 Your input data should sit on the scratch:
 
@@ -84,3 +82,18 @@ When done the results can be copied back to your group share
 
     cp -r /scratch/my_name/dataset_aligned /g/share_name/path/to/my/project
 
+## The output
+
+The results folder contains three items:
+
+ - ```log```: can be deleted if the run was successful, contains the log files for each snakemake task that ran on the cluster
+ - ```pre_align```: the final results, aka the aligned dataset
+ - ```pre_align_cache```: see below
+
+The ```pre_align_cache``` folder will contain three items:
+
+ - A folder called ```offsets_local``` which contains the relative movement for each slice with respect to the previous
+ - A file called ```final_offsets.json``` which contains the offsets that need to be performed for the final alignment
+ - A file called ```params.json``` which contains all parameters that were used (including defaults)
+
+It can make sense to keep the ```*.json``` files as they describe the run and can be used to reproduce the result
