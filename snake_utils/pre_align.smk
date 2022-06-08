@@ -49,7 +49,7 @@ rule apply_translations:
         os.path.join(target_folder, "pre_align", "{name}")
     threads: 1
     resources:
-        cpus=1, time_min=10, mem_mb=512
+        cpus=1, time_min=10, mem_mb=1024
     params:
         p='htc', gres=''
     script:
