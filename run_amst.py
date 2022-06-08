@@ -2,7 +2,7 @@
 import os
 import snakemake
 from glob import glob
-from amst_utils.common.settings import set_run_info, set_params, get_params_fp, get_params, get_workdir
+from amst_utils.common.settings import set_run_info, set_params, get_params_fp, get_params
 
 
 def run_amst(
