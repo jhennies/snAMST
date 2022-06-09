@@ -207,6 +207,10 @@ if __name__ == '__main__':
         cluster = None
     if local_norm_quantiles[0] == 0 and local_norm_quantiles[1] == 0:
         local_norm_quantiles = None
+    if local_mask_range[0] == 0 and local_mask_range[1] == 0:
+        local_mask_range = None
+    if local_thresh[0] == 0 and local_thresh[1] == 0:
+        local_thresh = None
     if cores == 0:
         cores = os.cpu_count()
 
