@@ -10,6 +10,7 @@ def run_pre_align(
         target_folder,
         local_align_method=None,
         local_mask_range=None,
+        local_thresh=None,
         local_sigma=1.6,
         local_norm_quantiles=(0.1, 0.9),
         local_device_type='GPU',
@@ -61,6 +62,7 @@ def run_pre_align(
                 local=None if local_align_method is None else dict(
                     align_method=local_align_method,
                     mask_range=local_mask_range,
+                    thresh=local_thresh,
                     sigma=local_sigma,
                     norm_quantiles=local_norm_quantiles,
                     device_type=local_device_type,
@@ -132,7 +134,9 @@ if __name__ == '__main__':
                         help='Method for local alignment: "sift", "xcorr", or "none"')
     parser.add_argument('-lmr', '--local_mask_range', type=float, nargs=2, default=None,
                         metavar=('lower', 'upper'),
-                        help='Similar to threshold, except values above the upper threshold are set to zero')
+                        help='Similar to local_thresh, except values above the upper threshold are set to zero')
+    parser.add_argument('-lth', '--local_thresh', type=float, nargs=2, default=None,
+                        help='Threshold to clip the data (upper and lower bound)')
     parser.add_argument('-lsg', '--local_sigma', type=float, default=1.6,
                         help='Smooths the data before local alignment')
     parser.add_argument('-lnq', '--local_norm_quantiles', type=float, nargs=2, default=(0.1, 0.9),
@@ -177,6 +181,7 @@ if __name__ == '__main__':
     target_folder = args.target_folder
     local_align_method = args.local_align_method
     local_mask_range = args.local_mask_range
+    local_thresh = args.local_thresh
     local_sigma = args.local_sigma
     local_norm_quantiles = args.local_norm_quantiles
     local_device_type = args.local_device_type
@@ -200,6 +205,8 @@ if __name__ == '__main__':
         local_align_method = None
     if cluster == 'none':
         cluster = None
+    if local_norm_quantiles[0] == 0 and local_norm_quantiles[1] == 0:
+        local_norm_quantiles = None
     if cores == 0:
         cores = os.cpu_count()
 
@@ -208,6 +215,7 @@ if __name__ == '__main__':
         target_folder,
         local_align_method=local_align_method,
         local_mask_range=local_mask_range,
+        local_thresh=local_thresh,
         local_sigma=local_sigma,
         local_norm_quantiles=local_norm_quantiles,
         local_device_type=local_device_type,

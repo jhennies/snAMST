@@ -16,6 +16,7 @@ def local_alignment(
         result_fp,
         align_method='sift',
         mask_range=None,
+        thresh=None,
         sigma=1.6,
         norm_quantiles=(0.1, 0.9),
         device_type='GPU',
@@ -37,6 +38,7 @@ def local_alignment(
             out = offset_with_sift(
                 im_fp, ref_im_fp,
                 mask_range=mask_range,
+                thresh=thresh,
                 sigma=sigma,
                 norm_quantiles=norm_quantiles,
                 device_type=device_type,
@@ -86,6 +88,7 @@ if __name__ == '__main__':
     params = get_params()
     local_align_method = params['local']['align_method']
     local_mask_range = params['local']['mask_range']
+    local_thresh = params['local']['thresh']
     local_sigma = params['local']['sigma']
     local_norm_quantiles = params['local']['norm_quantiles']
     local_device_type = params['local']['device_type']
@@ -103,6 +106,7 @@ if __name__ == '__main__':
         output,
         align_method=local_align_method,
         mask_range=local_mask_range,
+        thresh=local_thresh,
         sigma=local_sigma,
         norm_quantiles=local_norm_quantiles,
         device_type=local_device_type,

@@ -130,10 +130,21 @@ def _sift(
     else:
         return float(offset[0]), float(offset[1])
 
+    # # FIXME remove
+    # kp_im = np.zeros(image.shape, dtype='uint8')
+    # from vigra.filters import gaussianSmoothing
+    # for kp in keypoints_moving:
+    #     print(f'kp = {kp}')
+    #     kp_im[int(kp[1]), int(kp[0])] = 255
+    # kp_im = gaussianSmoothing(kp_im, 5)
+    # kp_im = (kp_im.astype(float) / kp_im.max() * 255).astype('uint8')
+    # return (float(offset[0]), float(offset[1])), image, reference, kp_im
+
 
 def offset_with_sift(
         im_fp, ref_im_fp,
         mask_range=None,
+        thresh=None,
         sigma=1.6,
         norm_quantiles=(0.1, 0.9),
         device_type='GPU',
@@ -145,8 +156,29 @@ def offset_with_sift(
     im = imread(im_fp)
     ref_im = imread(ref_im_fp)
 
-    im = preprocess_slice(im, sigma=sigma, mask_range=mask_range)
-    ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range)
+    im = preprocess_slice(im, sigma=sigma, mask_range=mask_range, thresh=thresh)
+    ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
+
+    # # FIXME remove
+    # offsets, im, ref_im, kp_im = _sift(
+    #     im, ref_im,
+    #     devicetype=device_type,
+    #     norm_quantiles=norm_quantiles,
+    #     auto_mask=auto_mask,
+    #     verbose=verbose
+    # )
+    # from h5py import File
+    # import os
+    # with File(
+    #         os.path.join(
+    #             '/media/julian/Data/tmp/sift_test/',
+    #             os.path.split(im_fp)[1]
+    #         ),
+    #         mode='w'
+    # ) as f:
+    #     f.create_dataset('im', data=im, compression='gzip')
+    #     f.create_dataset('ref_im', data=ref_im, compression='gzip')
+    #     f.create_dataset('kp_im', data=kp_im, compression='gzip')
 
     offsets = _sift(
         im, ref_im,
