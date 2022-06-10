@@ -112,7 +112,7 @@ if use_local:
         threads: 1
         resources:
             gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0,
-            cpus=1, time_min=10, mem_mb=8192
+            cpus=1, time_min=10, mem_mb=16384
         params:
             ref_im=get_ref_im,
             p='gpu' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 'htc',
