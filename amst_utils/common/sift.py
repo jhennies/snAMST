@@ -3,6 +3,7 @@ from tifffile import imread
 import numpy as np
 from silx.image import sift
 from .data import get_bounds
+from vigra.filters import discErosion
 
 from amst_utils.common.slice_pre_processing import preprocess_slice
 
@@ -25,9 +26,8 @@ def _norm_8bit(im, quantiles, ignore_zeros=False):
 
 def _mask_keypoint_out_of_roi(image, kp, erode=10):
 
-    from matplotlib import pyplot as plt
-    from vigra.filters import discDilation, discErosion
-    plt.imshow(image)
+    # from matplotlib import pyplot as plt
+    # plt.imshow(image)
 
     # Generate the mask
     mask = image > 0
@@ -37,8 +37,8 @@ def _mask_keypoint_out_of_roi(image, kp, erode=10):
     # plt.figure()
     # plt.imshow(mask)
     mask = discErosion(mask.astype('uint8'), erode)
-    plt.figure()
-    plt.imshow(mask)
+    # plt.figure()
+    # plt.imshow(mask)
 
     # Remove keypoints within the mask
     # point_map = np.zeros(mask.shape, dtype='uint8')
@@ -179,7 +179,6 @@ def offset_with_sift(
     #     f.create_dataset('im', data=im, compression='gzip')
     #     f.create_dataset('ref_im', data=ref_im, compression='gzip')
     #     f.create_dataset('kp_im', data=kp_im, compression='gzip')
-
     offsets = _sift(
         im, ref_im,
         devicetype=device_type,

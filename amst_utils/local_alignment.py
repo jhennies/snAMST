@@ -51,7 +51,22 @@ def local_alignment(
             offset, bounds = out if save_bounds else (out, None)
 
         elif align_method == 'xcorr':
-            raise NotImplementedError(f'Cross-correlation is not yet implemented!')
+
+            from amst_utils.common.xcorr import offsets_with_xcorr
+            out = offsets_with_xcorr(
+                im_fp, ref_im_fp,
+                mask_range=mask_range,
+                thresh=thresh,
+                sigma=sigma,
+                norm_quantiles=norm_quantiles,
+                return_bounds=save_bounds,
+                auto_mask=auto_mask,
+                verbose=verbose
+            )
+            if verbose:
+                print(f'out = {out}')
+            offset, bounds = out if save_bounds else (out, None)
+
         else:
             raise ValueError(f'Unknown alignment method: {align_method}')
 
