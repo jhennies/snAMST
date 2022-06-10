@@ -8,7 +8,17 @@ source_folder=/scratch/path/to/source/
 target_folder=/scratch/path/to/results/
 
 # Workflow parameters
-local_auto_mask=10      # Automatically remove SIFT key-points which are at the edge of the actual (non-zero) data
+local_align_method=sift         # "sift" or "xcorr", in most cases SIFT is better
+local_auto_mask=10              # Automatically remove SIFT key-points which are at the edge of the actual (non-zero) data
+local_norm_quantile_low=0.01    # How to normalize the data (lower and upper bound using quantiles)
+local_norm_quantile_high=0.99
+
+# These parameters can be used to the threshold the data before runnin the alignment. However, I currently don't
+# recommend using these.
+local_mask_range_low=0
+local_mask_range_high=0
+local_thresh_low=0
+local_thresh_high=0
 
 # Compute settings
 local_device_type=CPU   # CPU is currently more efficient for the cluster
@@ -37,8 +47,11 @@ which python
 python ${src_path}/run_pre_align.py \
 -sf $source_folder \
 -tf $target_folder \
--lam sift \
+-lam $local_align_method \
 -lau $local_auto_mask \
+-lnq $local_norm_quantile_low $local_norm_quantile_high \
+-lmr $local_mask_range_low $local_mask_range_high \
+-lth $local_thresh_low $local_thresh_high \
 -ldt $local_device_type \
 -apd \
 -c $cores \
