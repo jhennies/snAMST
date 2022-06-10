@@ -55,8 +55,8 @@ def compute_auto_pad(offsets, bounds):
     starts = []
     stops = []
     for idx, b in enumerate(bounds):
-        starts.append(np.array((b[0], b[1])) + offsets[idx][::-1])
-        stops.append(np.array((b[2], b[3])) + offsets[idx][::-1])
+        starts.append(offsets[idx][::-1])
+        stops.append(np.array((b[2], b[3])) - np.array((b[0], b[1])) + offsets[idx][::-1])
     min_yx = np.floor(np.min(starts, axis=0)).astype(int)
     max_yx = np.ceil(np.max(stops, axis=0)).astype(int)
     # Pad a little to each side to make it less squished
