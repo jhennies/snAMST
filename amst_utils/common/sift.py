@@ -141,6 +141,12 @@ def _sift(
     # return (float(offset[0]), float(offset[1])), image, reference, kp_im
 
 
+def _invert_nonzero(img):
+    img_max = img.max()
+    img[img > 0] = img_max - img[img > 0]
+    return img
+
+
 def offset_with_sift(
         im_fp, ref_im_fp,
         mask_range=None,
@@ -150,11 +156,29 @@ def offset_with_sift(
         device_type='GPU',
         return_bounds=False,
         auto_mask=None,
+        max_offset=None,
+        xy_range=None,
+        invert_nonzero=False,
         verbose=False
 ):
 
-    im = imread(im_fp)
-    ref_im = imread(ref_im_fp)
+    bounds = None
+    if xy_range is not None:
+        x, y, w, h = xy_range
+        im = imread(im_fp)
+        if return_bounds:
+            bounds = get_bounds(im)
+        im = im[y:y+h, x:x+w]
+        ref_im = imread(ref_im_fp)[y:y+h, x:x+w]
+    else:
+        im = imread(im_fp)
+        if return_bounds:
+            bounds = get_bounds(im)
+        ref_im = imread(ref_im_fp)
+
+    if invert_nonzero:
+        im = _invert_nonzero(im)
+        ref_im = _invert_nonzero(ref_im)
 
     im = preprocess_slice(im, sigma=sigma, mask_range=mask_range, thresh=thresh)
     ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
@@ -187,8 +211,11 @@ def offset_with_sift(
         verbose=verbose
     )
     offsets = -np.array(offsets)
+    if max_offset is not None:
+        if abs(offsets[0]) > max_offset[0] or abs(offsets[1]) > max_offset[1]:
+            offsets = np.array([0., 0.])
 
     if return_bounds:
-        return offsets.tolist(), get_bounds(im)
+        return offsets.tolist(), bounds
     else:
         return offsets.tolist()
