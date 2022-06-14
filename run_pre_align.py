@@ -16,6 +16,8 @@ def run_pre_align(
         local_device_type='GPU',
         local_auto_mask=None,
         local_max_offset=None,
+        local_xy_range=None,
+        local_invert_nonzero=False,
         template=None,
         tm_threshold=(0, 0),
         tm_sigma=0.,
@@ -68,7 +70,9 @@ def run_pre_align(
                     norm_quantiles=local_norm_quantiles,
                     device_type=local_device_type,
                     auto_mask=local_auto_mask,
-                    max_offset=local_max_offset
+                    max_offset=local_max_offset,
+                    xy_range=local_xy_range,
+                    invert_nonzero=local_invert_nonzero
                 ),
                 tm=None if template is None else dict(
                     template=template,
@@ -149,6 +153,11 @@ if __name__ == '__main__':
                         help='Generates a mask by eroding the non-zero data by the specified amount')
     parser.add_argument('-lmo', '--local_max_offset', type=int, nargs=2, default=None,
                         help='Maximum offset allowed to avoid big jumps when the alignment failed')
+    parser.add_argument('-lxy', '--local_xy_range', type=int, nargs=4, default=None,
+                        metavar=('X', 'Y', 'W', 'H'),
+                        help='Crop xy-range for computation: (x, y, width, height)')
+    parser.add_argument('-liv', '--local_invert_nonzero', action='store_true',
+                        help='The SIFT performs a lot better if the features of interest are bright')
     parser.add_argument('-tm', '--template', type=str,
                         help='Location of template tiff image. Enables template matching step if set')
     parser.add_argument('-tmt', '--tm_threshold', type=float, nargs=2, default=[0, 0],
@@ -191,6 +200,8 @@ if __name__ == '__main__':
     local_device_type = args.local_device_type
     local_auto_mask = args.local_auto_mask
     local_max_offset = args.local_max_offset
+    local_xy_range = args.local_xy_range
+    local_invert_nonzero = args.local_invert_nonzero
     template = args.template
     tm_threshold = args.tm_threshold
     tm_sigma = args.tm_sigma
@@ -230,6 +241,8 @@ if __name__ == '__main__':
         local_device_type=local_device_type,
         local_auto_mask=local_auto_mask,
         local_max_offset=local_max_offset,
+        local_xy_range=local_xy_range,
+        local_invert_nonzero=local_invert_nonzero,
         template=template,
         tm_threshold=tm_threshold,
         tm_sigma=tm_sigma,
