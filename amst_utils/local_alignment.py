@@ -22,6 +22,7 @@ def local_alignment(
         device_type='GPU',
         save_bounds=False,
         auto_mask=None,
+        max_offset=None,
         verbose=False
 ):
 
@@ -44,6 +45,7 @@ def local_alignment(
                 device_type=device_type,
                 return_bounds=save_bounds,
                 auto_mask=auto_mask,
+                max_offset=max_offset,
                 verbose=verbose
             )
             if verbose:
@@ -108,6 +110,7 @@ if __name__ == '__main__':
     local_norm_quantiles = params['local']['norm_quantiles']
     local_device_type = params['local']['device_type']
     local_auto_mask = params['local']['auto_mask']
+    local_max_offset = params['local']['max_offset']
     auto_pad = params['auto_pad']
     verbose = params['verbose']
 
@@ -127,5 +130,6 @@ if __name__ == '__main__':
         device_type=local_device_type,
         save_bounds=auto_pad,
         auto_mask=local_auto_mask,
+        max_offset=local_max_offset,
         verbose=verbose
     )

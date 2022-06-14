@@ -15,6 +15,7 @@ def run_pre_align(
         local_norm_quantiles=(0.1, 0.9),
         local_device_type='GPU',
         local_auto_mask=None,
+        local_max_offset=None,
         template=None,
         tm_threshold=(0, 0),
         tm_sigma=0.,
@@ -66,7 +67,8 @@ def run_pre_align(
                     sigma=local_sigma,
                     norm_quantiles=local_norm_quantiles,
                     device_type=local_device_type,
-                    auto_mask=local_auto_mask
+                    auto_mask=local_auto_mask,
+                    max_offset=local_max_offset
                 ),
                 tm=None if template is None else dict(
                     template=template,
@@ -145,6 +147,8 @@ if __name__ == '__main__':
                         help='For SIFT: either GPU or CPU')
     parser.add_argument('-lau', '--local_auto_mask', type=int, default=None,
                         help='Generates a mask by eroding the non-zero data by the specified amount')
+    parser.add_argument('-lmo', '--local_max_offset', type=int, nargs=2, default=None,
+                        help='Maximum offset allowed to avoid big jumps when the alignment failed')
     parser.add_argument('-tm', '--template', type=str,
                         help='Location of template tiff image. Enables template matching step if set')
     parser.add_argument('-tmt', '--tm_threshold', type=float, nargs=2, default=[0, 0],
@@ -186,6 +190,7 @@ if __name__ == '__main__':
     local_norm_quantiles = args.local_norm_quantiles
     local_device_type = args.local_device_type
     local_auto_mask = args.local_auto_mask
+    local_max_offset = args.local_max_offset
     template = args.template
     tm_threshold = args.tm_threshold
     tm_sigma = args.tm_sigma
@@ -224,6 +229,7 @@ if __name__ == '__main__':
         local_norm_quantiles=local_norm_quantiles,
         local_device_type=local_device_type,
         local_auto_mask=local_auto_mask,
+        local_max_offset=local_max_offset,
         template=template,
         tm_threshold=tm_threshold,
         tm_sigma=tm_sigma,
