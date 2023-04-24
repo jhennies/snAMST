@@ -26,7 +26,7 @@ Adding snakemake
 
 Currently only the pre-alignment procedure is implemented. For a usage example see ```example_pre_align.sh```. 
 
-The example shows how to use the pre_align.py to perform a SIFT alignment. For a more advanced alignment procedure including a template matching on a fiducial include the ```--template_matching``` or ```-tm``` argument.
+The example shows how to use the pre_align.py to perform a SIFT alignment. For a more advanced alignment procedure including a template matching on a fiducial include the ```--template``` or ```-tm``` argument.
 
 ### On the cluster (description for EMBL internal use)
 
