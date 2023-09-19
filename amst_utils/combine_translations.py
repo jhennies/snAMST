@@ -6,6 +6,7 @@ import numpy as np
 
 from amst_utils.common.settings import get_params, get_run_info
 from amst_utils.common.displacement import smooth_offsets, compute_auto_pad, sequentialize_offsets
+from amst_utils.common.displacement import apply_running_average
 
 
 def combine_translations(
@@ -17,6 +18,7 @@ def combine_translations(
         smooth_median=8,
         smooth_sigma=8,
         suppress_x=False,
+        subtract_running_average=False,
         verbose=False,
 ):
 
@@ -53,6 +55,9 @@ def combine_translations(
     elif tm_offsets is None:
         offsets = local_offsets
 
+    if subtract_running_average:
+        offsets = apply_running_average(offsets)
+
     shape = None
     if bounds is not None:
         offsets, shape = compute_auto_pad(offsets, bounds)
@@ -82,6 +87,7 @@ if __name__ == '__main__':
     combine_median = params['combine_median']
     combine_sigma = params['combine_sigma']
     auto_pad = params['auto_pad']
+    subtract_running_average = params['subtract_running_average']
     verbose = params['verbose']
     # Get list of images
     im_list = get_run_info()['im_list']
@@ -120,5 +126,6 @@ if __name__ == '__main__':
         smooth_median=combine_median,
         smooth_sigma=combine_sigma,
         bounds_fps=bounds_fps,
+        subtract_running_average=subtract_running_average,
         verbose=verbose
     )
