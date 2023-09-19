@@ -1,5 +1,7 @@
 # snAMST
-AMST implementation using Snakemake workflow management
+AMST implementation using Snakemake workflow management. For the origninal implementation see github.com/jhennies/amst
+
+Note that this repository is a work in progress. Currently only a pre-alignment procedure is implemented.
 
 ## Installation
 
@@ -22,7 +24,11 @@ Adding snakemake
 
 ## Usage
 
-### On the cluster (recommended)
+Currently only the pre-alignment procedure is implemented. For a usage example see ```example_pre_align.sh```. 
+
+The example shows how to use the pre_align.py to perform a SIFT alignment. For a more advanced alignment procedure including a template matching on a fiducial include the ```--template``` or ```-tm``` argument.
+
+### On the cluster (description for EMBL internal use)
 
 For the following description, change the path names as required.
 
