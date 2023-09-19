@@ -18,11 +18,13 @@ source_folder = run_info['source_folder']
 target_folder = run_info['target_folder']
 im_list = run_info['im_list']
 im_names = run_info['im_names']
+mask_list = run_info['mask_list']
 verbose = run_info['verbose']
 
 # The list of reference image slices
 ref_list = [None] + im_list[:-1]
 ref_dict = dict(zip(im_names, ref_list))
+mask_dict = dict(zip(im_names, mask_list)) if mask_list is not None else None
 
 # Parameters which are relevant to build the snakemake workflow
 use_local = 'local' in params.keys() and params['local'] is not None
@@ -103,6 +105,9 @@ def get_ref_im(wildcards):
     ref_im = replace_special(ref_dict[wildcards.name])
     return ref_im
 
+def get_mask_im(wildcards):
+    return mask_dict[wildcards.name] if mask_dict is not None else None
+
 if use_local:
     rule local_alignment:
         input:
@@ -115,6 +120,7 @@ if use_local:
             cpus=1, time_min=10, mem_mb=16384
         params:
             ref_im=get_ref_im,
+            mask_im=get_mask_im,
             p='gpu' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 'htc',
             gres='--gres=gpu:1' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else ''
         script:

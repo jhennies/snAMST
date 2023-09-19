@@ -15,6 +15,7 @@ def run_pre_align(
         local_norm_quantiles=(0.1, 0.9),
         local_device_type='GPU',
         local_auto_mask=None,
+        local_mask_folder=None,
         local_max_offset=None,
         local_xy_range=None,
         local_invert_nonzero=False,
@@ -43,6 +44,7 @@ def run_pre_align(
     # Parse the source folder
     im_list = sorted(glob(os.path.join(source_folder, '*.tif')))
     im_names = [os.path.split(fp)[1] for fp in im_list]
+    mask_list = sorted(glob(os.path.join(local_mask_folder, '*.tif'))) if local_mask_folder is not None else None
 
     # Make run_info
     set_run_info(
@@ -52,6 +54,7 @@ def run_pre_align(
             params_fp=align_params if align_params is not None else get_params_fp(folder=os.path.join(target_folder, 'pre_align_cache')),
             im_list=im_list,
             im_names=im_names,
+            mask_list=mask_list,
             batch_size=batch_size,
             verbose=verbose
         )
@@ -71,6 +74,7 @@ def run_pre_align(
                     norm_quantiles=local_norm_quantiles,
                     device_type=local_device_type,
                     auto_mask=local_auto_mask,
+                    mask_folder=local_mask_folder,
                     max_offset=local_max_offset,
                     xy_range=local_xy_range,
                     invert_nonzero=local_invert_nonzero
@@ -153,6 +157,8 @@ if __name__ == '__main__':
                         help='For SIFT: either GPU or CPU')
     parser.add_argument('-lau', '--local_auto_mask', type=int, default=None,
                         help='Generates a mask by eroding the non-zero data by the specified amount')
+    parser.add_argument('-lmk', '--local_mask_folder', type=str, default=None,
+                        help='Supply a mask dataset with same dimensions as the source dataset')
     parser.add_argument('-lmo', '--local_max_offset', type=int, nargs=2, default=None,
                         help='Maximum offset allowed to avoid big jumps when the alignment failed')
     parser.add_argument('-lxy', '--local_xy_range', type=int, nargs=4, default=None,
@@ -203,6 +209,7 @@ if __name__ == '__main__':
     local_norm_quantiles = args.local_norm_quantiles
     local_device_type = args.local_device_type
     local_auto_mask = args.local_auto_mask
+    local_mask_folder = args.local_mask_folder
     local_max_offset = args.local_max_offset
     local_xy_range = args.local_xy_range
     local_invert_nonzero = args.local_invert_nonzero
@@ -234,6 +241,8 @@ if __name__ == '__main__':
         local_thresh = None
     if cores == 0:
         cores = os.cpu_count()
+    if local_mask_folder == 'none':
+        local_mask_folder = None
 
     run_pre_align(
         source_folder,
@@ -245,6 +254,7 @@ if __name__ == '__main__':
         local_norm_quantiles=local_norm_quantiles,
         local_device_type=local_device_type,
         local_auto_mask=local_auto_mask,
+        local_mask_folder=local_mask_folder,
         local_max_offset=local_max_offset,
         local_xy_range=local_xy_range,
         local_invert_nonzero=local_invert_nonzero,

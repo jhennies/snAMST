@@ -24,19 +24,21 @@ def _norm_8bit(im, quantiles, ignore_zeros=False):
     return im.astype('uint8')
 
 
-def _mask_keypoint_out_of_roi(image, kp, erode=10):
+def _mask_keypoint_out_of_roi(image, kp, erode=10, mask=None):
 
     # from matplotlib import pyplot as plt
     # plt.imshow(image)
 
     # Generate the mask
-    mask = image > 0
+    if mask is None:
+        mask = image > 0
     # plt.figure()
     # plt.imshow(mask)
     # mask = discErosion(mask.astype('uint8'), 1)
     # plt.figure()
     # plt.imshow(mask)
-    mask = discErosion(mask.astype('uint8'), erode)
+    if erode > 0:
+        mask = discErosion(mask.astype('uint8'), erode)
     # plt.figure()
     # plt.imshow(mask)
 
@@ -68,6 +70,7 @@ def _sift(
         norm_quantiles=None,
         return_keypoints=False,
         auto_mask=None,
+        mask=None,
         verbose=False
 ):
 
@@ -92,6 +95,8 @@ def _sift(
     keypoints_moving = sift_ocl.keypoints(image)
     if verbose:
         print(f'len(keypoints_moving) = {len(keypoints_moving)}')
+    if mask is not None:
+        keypoints_moving = _mask_keypoint_out_of_roi(image, keypoints_moving, erode=0, mask=mask)
     if auto_mask is not None:
         keypoints_moving = _mask_keypoint_out_of_roi(image, keypoints_moving, erode=auto_mask)
         if verbose:
@@ -130,16 +135,6 @@ def _sift(
     else:
         return float(offset[0]), float(offset[1])
 
-    # # FIXME remove
-    # kp_im = np.zeros(image.shape, dtype='uint8')
-    # from vigra.filters import gaussianSmoothing
-    # for kp in keypoints_moving:
-    #     print(f'kp = {kp}')
-    #     kp_im[int(kp[1]), int(kp[0])] = 255
-    # kp_im = gaussianSmoothing(kp_im, 5)
-    # kp_im = (kp_im.astype(float) / kp_im.max() * 255).astype('uint8')
-    # return (float(offset[0]), float(offset[1])), image, reference, kp_im
-
 
 def _invert_nonzero(img):
     img_max = img.max()
@@ -159,6 +154,7 @@ def offset_with_sift(
         max_offset=None,
         xy_range=None,
         invert_nonzero=False,
+        mask_im_fp=None,
         verbose=False
 ):
 
@@ -170,11 +166,13 @@ def offset_with_sift(
             bounds = get_bounds(im)
         im = im[y:y+h, x:x+w]
         ref_im = imread(ref_im_fp)[y:y+h, x:x+w]
+        mask_im = imread(mask_im_fp)[y:y+h, x:x+w] if mask_im_fp is not None else None
     else:
         im = imread(im_fp)
         if return_bounds:
             bounds = get_bounds(im)
         ref_im = imread(ref_im_fp)
+        mask_im = imread(mask_im_fp) if mask_im_fp is not None else None
 
     # TODO Apply the bounds to save computational time! Depending on how much zero padding is in the data, this is more
     #   than substantial!
@@ -186,31 +184,12 @@ def offset_with_sift(
     im = preprocess_slice(im, sigma=sigma, mask_range=mask_range, thresh=thresh)
     ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
 
-    # # FIXME remove
-    # offsets, im, ref_im, kp_im = _sift(
-    #     im, ref_im,
-    #     devicetype=device_type,
-    #     norm_quantiles=norm_quantiles,
-    #     auto_mask=auto_mask,
-    #     verbose=verbose
-    # )
-    # from h5py import File
-    # import os
-    # with File(
-    #         os.path.join(
-    #             '/media/julian/Data/tmp/sift_test/',
-    #             os.path.split(im_fp)[1]
-    #         ),
-    #         mode='w'
-    # ) as f:
-    #     f.create_dataset('im', data=im, compression='gzip')
-    #     f.create_dataset('ref_im', data=ref_im, compression='gzip')
-    #     f.create_dataset('kp_im', data=kp_im, compression='gzip')
     offsets = _sift(
         im, ref_im,
         devicetype=device_type,
         norm_quantiles=norm_quantiles,
         auto_mask=auto_mask,
+        mask_im=mask_im,
         verbose=verbose
     )
     offsets = -np.array(offsets)
