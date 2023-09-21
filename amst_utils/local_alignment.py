@@ -116,7 +116,6 @@ if __name__ == '__main__':
     local_sigma = params['local']['sigma']
     local_norm_quantiles = params['local']['norm_quantiles']
     local_device_type = params['local']['device_type']
-    local_mask_im = params['local']['mask']
     local_auto_mask = params['local']['auto_mask']
     local_max_offset = params['local']['max_offset']
     local_xy_range = params['local']['xy_range']
