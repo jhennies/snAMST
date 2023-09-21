@@ -107,6 +107,7 @@ if __name__ == '__main__':
         )
     else:
         ref_im = None
+    mask_im = snakemake.params['mask_im']
     # Get parameters from run_info
     params = get_params()
     local_align_method = params['local']['align_method']
@@ -142,6 +143,6 @@ if __name__ == '__main__':
         max_offset=local_max_offset,
         xy_range=local_xy_range,
         invert_nonzero=local_invert_nonzero,
-        mask_im_fp=local_mask_im,
+        mask_im_fp=mask_im,
         verbose=verbose
     )
