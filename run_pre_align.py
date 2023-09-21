@@ -241,6 +241,8 @@ if __name__ == '__main__':
         local_mask_range = None
     if local_thresh is not None and local_thresh[0] == 0 and local_thresh[1] == 0:
         local_thresh = None
+    if local_xy_range is not None and local_xy_range[0] == 0 and local_xy_range[1] == 0:
+        local_xy_range = None
     if cores == 0:
         cores = os.cpu_count()
     if local_mask_folder == 'none':
