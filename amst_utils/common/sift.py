@@ -78,8 +78,16 @@ def _sift(
         raise RuntimeError('Either sift_ocl or devicetype need to be supplied')
 
     if norm_quantiles is not None:
-        image = _norm_8bit(image, norm_quantiles, ignore_zeros=auto_mask is not None)
-        reference = _norm_8bit(reference, norm_quantiles, ignore_zeros=auto_mask is not None) if type(reference) == np.ndarray else reference
+        if mask is not None:
+            im_in = image[:]
+            im_in[mask == 0] = 0
+            ref_in = reference[:]
+            ref_in[mask == 0] = 0
+        else:
+            im_in = image
+            ref_in = image
+        image = _norm_8bit(im_in, norm_quantiles, ignore_zeros=auto_mask is not None)
+        reference = _norm_8bit(ref_in, norm_quantiles, ignore_zeros=auto_mask is not None) if type(reference) == np.ndarray else reference
 
     # Initialize the SIFT
     if sift_ocl is None:
