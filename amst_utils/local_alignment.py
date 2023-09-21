@@ -107,7 +107,6 @@ if __name__ == '__main__':
         )
     else:
         ref_im = None
-    mask_im = snakemake.params['mask_im']
     # Get parameters from run_info
     params = get_params()
     local_align_method = params['local']['align_method']
@@ -116,12 +115,12 @@ if __name__ == '__main__':
     local_sigma = params['local']['sigma']
     local_norm_quantiles = params['local']['norm_quantiles']
     local_device_type = params['local']['device_type']
+    local_mask_im = params['local']['mask']
     local_auto_mask = params['local']['auto_mask']
     local_max_offset = params['local']['max_offset']
     local_xy_range = params['local']['xy_range']
     local_invert_nonzero = params['local']['invert_nonzero']
     auto_pad = params['auto_pad']
-    mask = params['mask']
     verbose = params['verbose']
 
     if verbose:
@@ -143,6 +142,6 @@ if __name__ == '__main__':
         max_offset=local_max_offset,
         xy_range=local_xy_range,
         invert_nonzero=local_invert_nonzero,
-        mask_im=mask_im,
+        mask_im_fp=local_mask_im,
         verbose=verbose
     )
