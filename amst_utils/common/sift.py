@@ -189,7 +189,7 @@ def offset_with_sift(
         devicetype=device_type,
         norm_quantiles=norm_quantiles,
         auto_mask=auto_mask,
-        mask_im=mask_im,
+        mask=mask_im,
         verbose=verbose
     )
     offsets = -np.array(offsets)
