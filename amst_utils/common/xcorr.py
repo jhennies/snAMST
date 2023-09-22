@@ -76,6 +76,13 @@ def _xcorr(
         if moving_mask is not None:
             print(f'moving_mask.shape = {moving_mask.shape}')
 
+    if moving_mask is not None:
+        s_ = get_bounds(moving_mask)
+        reference = reference[s_]
+        image = image[s_]
+        ref_mask = ref_mask[s_]
+        moving_mask = moving_mask[s_]
+
     shift, _, _ = phase_cross_correlation(
         reference, image,
         reference_mask=ref_mask,
