@@ -6,7 +6,7 @@ from tifffile import imread
 import numpy as np
 from vigra.filters import discErosion
 
-from .data import get_bounds
+from .data import get_bounds, _crop_zero_padding
 from amst_utils.common.slice_pre_processing import preprocess_slice
 
 
@@ -77,7 +77,7 @@ def _xcorr(
             print(f'moving_mask.shape = {moving_mask.shape}')
 
     if moving_mask is not None:
-        s_ = get_bounds(moving_mask)
+        s_ = _crop_zero_padding(moving_mask)
         reference = reference[s_]
         image = image[s_]
         ref_mask = ref_mask[s_]

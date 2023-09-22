@@ -3,7 +3,7 @@ from tifffile import imread
 import numpy as np
 
 
-def _crop_zero_padding(dat, return_ints=False):
+def crop_zero_padding(dat, return_ints=False):
     # argwhere will give you the coordinates of every non-zero point
     true_points = np.argwhere(dat)
     # take the smallest points and use them as the top left of your crop
@@ -23,4 +23,4 @@ def _crop_zero_padding(dat, return_ints=False):
 def get_bounds(im):
     if type(im) == str:
         im = imread(im)
-    return _crop_zero_padding(im, return_ints=True)
+    return crop_zero_padding(im, return_ints=True)
