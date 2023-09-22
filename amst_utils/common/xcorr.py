@@ -59,9 +59,13 @@ def _xcorr(
         reference = _norm_8bit(ref_in, norm_quantiles, ignore_zeros=auto_mask is not None) if type(reference) == np.ndarray else reference
 
     if mask is None:
+        if verbose:
+            print(f'mask is None')
         ref_mask = _generate_mask(reference, auto_mask) if auto_mask is not None else None
         moving_mask = _generate_mask(image, auto_mask) if auto_mask is not None else None
     else:
+        if verbose:
+            print(f'mask is not None')
         ref_mask = moving_mask = mask
 
     if verbose:
