@@ -69,6 +69,7 @@ def local_alignment(
                 norm_quantiles=norm_quantiles,
                 return_bounds=save_bounds,
                 auto_mask=auto_mask,
+                mask_im_fp=mask_im_fp,
                 verbose=verbose
             )
             if verbose:
