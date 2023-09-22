@@ -6,7 +6,7 @@ from tifffile import imread
 import numpy as np
 from vigra.filters import discErosion
 
-from .data import get_bounds, _crop_zero_padding
+from .data import get_bounds, crop_zero_padding
 from amst_utils.common.slice_pre_processing import preprocess_slice
 
 
