@@ -64,6 +64,14 @@ def _xcorr(
     else:
         ref_mask = moving_mask = mask
 
+    if verbose:
+        print(f'reference.shape = {reference.shape}')
+        print(f'image.shape = {image.shape}')
+        if ref_mask is not None:
+            print(f'ref_mask.shape = {ref_mask.shape}')
+        if moving_mask is not None:
+            print(f'moving_mask.shape = {moving_mask.shape}')
+
     from tifffile import imsave
     imsave('./tmp_reference.tif', reference)
     imsave('./tmp_image.tif', image)
