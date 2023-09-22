@@ -58,15 +58,15 @@ def _xcorr(
         image = _norm_8bit(im_in, norm_quantiles, ignore_zeros=auto_mask is not None)
         reference = _norm_8bit(ref_in, norm_quantiles, ignore_zeros=auto_mask is not None) if type(reference) == np.ndarray else reference
 
-    if mask is None:
-        if verbose:
-            print(f'mask is None')
-        ref_mask = _generate_mask(reference, auto_mask) if auto_mask is not None else None
-        moving_mask = _generate_mask(image, auto_mask) if auto_mask is not None else None
-    else:
-        if verbose:
-            print(f'mask is not None')
-        ref_mask = moving_mask = mask
+    # if mask is None:
+    if verbose:
+        print(f'mask is None')
+    ref_mask = _generate_mask(reference, auto_mask) if auto_mask is not None else None
+    moving_mask = _generate_mask(image, auto_mask) if auto_mask is not None else None
+    # else:
+    #     if verbose:
+    #         print(f'mask is not None')
+    #     ref_mask = moving_mask = mask
 
     if verbose:
         print(f'reference.shape = {reference.shape}')
@@ -77,7 +77,7 @@ def _xcorr(
             print(f'moving_mask.shape = {moving_mask.shape}')
 
     if moving_mask is not None:
-        s_ = crop_zero_padding(moving_mask)
+        s_ = crop_zero_padding(np.logical_or(moving_mask, ref_mask))
         reference = reference[s_]
         image = image[s_]
         ref_mask = ref_mask[s_]
