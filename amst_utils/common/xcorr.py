@@ -64,7 +64,7 @@ def _xcorr(
     else:
         ref_mask = moving_mask = mask
 
-    shift = phase_cross_correlation(
+    shift, _, _ = phase_cross_correlation(
         reference, image,
         reference_mask=ref_mask,
         moving_mask=moving_mask,
