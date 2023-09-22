@@ -76,12 +76,6 @@ def _xcorr(
         if moving_mask is not None:
             print(f'moving_mask.shape = {moving_mask.shape}')
 
-    from tifffile import imsave
-    imsave('./tmp_reference.tif', reference)
-    imsave('./tmp_image.tif', image)
-    imsave('./tmp_ref_mask.tif', ref_mask)
-    imsave('./moving_mask.tif', moving_mask)
-
     shift, _, _ = phase_cross_correlation(
         reference, image,
         reference_mask=ref_mask,
