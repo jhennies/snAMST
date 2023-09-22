@@ -70,6 +70,8 @@ def _xcorr(
         moving_mask=moving_mask,
         upsample_factor=10
     )
+    if verbose:
+        print(f'shift = {shift}')
     return shift[1], shift[0]
 
 
