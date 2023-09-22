@@ -77,7 +77,7 @@ def _xcorr(
             print(f'moving_mask.shape = {moving_mask.shape}')
 
     if moving_mask is not None:
-        s_ = _crop_zero_padding(moving_mask)
+        s_ = crop_zero_padding(moving_mask)
         reference = reference[s_]
         image = image[s_]
         ref_mask = ref_mask[s_]
