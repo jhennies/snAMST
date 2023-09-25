@@ -19,7 +19,6 @@ def preprocess_slice(image, thresh=None, sigma=1., mask_range=None, med_diff=0):
         if thresh[1] > 0:
             image[image > thresh[1]] = thresh[1]
 
-    med_diff = 10
     if med_diff > 0:
         assert image.dtype == 'uint8'
         med_filt = discRankOrderFilter(image, med_diff, rank=0.5)
