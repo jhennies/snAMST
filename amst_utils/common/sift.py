@@ -26,39 +26,62 @@ def _norm_8bit(im, quantiles, ignore_zeros=False):
 
 def _mask_keypoint_out_of_roi(image, kp, erode=10, mask=None):
 
-    # from matplotlib import pyplot as plt
-    # plt.imshow(image)
+    # # DEBUG # #
+    print('1) imshow(image)')
+    from matplotlib import pyplot as plt
+    plt.imshow(image)
 
     # Generate the mask
     if mask is None:
-        mask = image > 0
-    # plt.figure()
-    # plt.imshow(mask)
-    # mask = discErosion(mask.astype('uint8'), 1)
-    # plt.figure()
-    # plt.imshow(mask)
+        from vigra.filters import gaussianSmoothing
+        mask = gaussianSmoothing(image, 1.6) > 0
+
+    # # DEBUG # #
+    print('2) imshow(mask)')
+    plt.figure()
+    plt.imshow(mask)
+    mask = discErosion(mask.astype('uint8'), 1)
+    print('3) imshow(mask)')
+    plt.figure()
+    plt.imshow(mask)
+
     if erode > 0:
         mask = discErosion(mask.astype('uint8'), erode)
-    # plt.figure()
-    # plt.imshow(mask)
+
+    # # DEBUG # #
+    print('4) after erosion: imshow(mask)')
+    plt.figure()
+    plt.imshow(mask)
 
     # Remove keypoints within the mask
-    # point_map = np.zeros(mask.shape, dtype='uint8')
-    # point_map_new = np.zeros(mask.shape, dtype='uint8')
+
+    # # DEBUG # #
+    print('generating SIFT point maps')
+    point_map = np.zeros(mask.shape, dtype='uint8')
+    point_map_new = np.zeros(mask.shape, dtype='uint8')
+
     new_kp = []
     for x in kp:
         p = [int(x[0] + 0.5), int(x[1] + 0.5)]
-        # point_map[p[1], p[0]] = 255
+
+        # # DEBUG # #
+        point_map[p[1], p[0]] = 255
+
         if mask[p[1], p[0]] > 0:
             new_kp.append(x)
-            # point_map_new[p[1], p[0]] = 255
 
-    # plt.figure()
-    # plt.imshow(discDilation(point_map, 5))
-    # plt.figure()
-    # plt.imshow(discDilation(point_map_new, 5))
-    #
-    # plt.show()
+            # # DEBUG # #
+            point_map_new[p[1], p[0]] = 255
+
+    # # DEBUG # #
+    print('5) showing SIFT point maps')
+    from vigra.filters import discDilation
+    plt.figure()
+    plt.imshow(discDilation(point_map, 5))
+    plt.figure()
+    plt.imshow(discDilation(point_map_new, 5))
+
+    plt.show()
     return np.array(new_kp)
 
 
@@ -114,8 +137,10 @@ def _sift(
     if type(reference) == np.ndarray:
         print(f'reference.dtype = {reference.dtype}')
         keypoints_ref = sift_ocl.keypoints(reference)
+        if mask is not None:
+            keypoints_ref = _mask_keypoint_out_of_roi(reference, keypoints_ref, erode=0, mask=mask)
         if auto_mask:
-            keypoints_ref = _mask_keypoint_out_of_roi(reference, keypoints_ref)
+            keypoints_ref = _mask_keypoint_out_of_roi(reference, keypoints_ref, erode=auto_mask)
     else:
         if reference is None:
             return (0., 0.), keypoints_moving
