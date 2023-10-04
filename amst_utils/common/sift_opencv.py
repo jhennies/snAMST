@@ -70,30 +70,44 @@ def _sift(
     # Compute matches
     if verbose:
         print('Matching keypoints')
-    FLANN_INDEX_KDTREE = 1
-    index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-    search_params = dict(checks=50)
-    flann = cv.FlannBasedMatcher(index_params, search_params)
-    # matches = flann.knnMatch(des1, des2, k=2)
-    matches = flann.match(des_img, des_ref)
+    # FLANN_INDEX_KDTREE = 1
+    # index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+    # search_params = dict(checks=50)
+    # flann = cv.FlannBasedMatcher(index_params, search_params)
+    # matches = flann.knnMatch(des_img, des_ref, k=2)
+    bf = cv.BFMatcher(cv.NORM_L2)
+    matches = bf.knnMatch(des_img, des_ref, k=2)
+    # matches = flann.match(des_img, des_ref)
 
-    # Make sure only to use the good matches
-    good = []
-    # for m, n in matches:
-    #     if m.distance < 0.7 * n.distance:
-    #         good.append(m)
-    matches = sorted(matches, key=lambda x: x.distance)
-    good = matches[:100]
+    final = []
+    add_to_factor = 0.0
+    max_it = 20
+    counter = 0
+    while len(final) < 5 and counter <= max_it:
 
-    # Only use inliers
-    src_pts = np.float32([kp_img[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
-    dst_pts = np.float32([kp_ref[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
+        print(f'counter = {counter}')
 
-    M, matches_mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 5.0)
-    matches_mask = matches_mask.ravel().tolist()
+        # Make sure only to use the good matches
+        good = []
+        for m, n in matches:
+            if m.distance < (0.7 + add_to_factor) * n.distance:
+                good.append(m)
+        # matches = sorted(matches, key=lambda x: x.distance)
+        # good = matches[:100]
 
-    # Determine offset
-    final = np.array(good)[np.array(matches_mask) > 0]
+        # Only use inliers
+        src_pts = np.float32([kp_img[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
+        dst_pts = np.float32([kp_ref[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
+
+        M, matches_mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 5.0)
+        matches_mask = matches_mask.ravel().tolist()
+
+        # Determine offset
+        final = np.array(good)[np.array(matches_mask) > 0]
+
+        add_to_factor += 0.1
+        counter += 1
+
     offset = np.median([
         [kp_img[x.queryIdx].pt[0] - kp_ref[x.trainIdx].pt[0],
          kp_img[x.queryIdx].pt[1] - kp_ref[x.trainIdx].pt[1]]
