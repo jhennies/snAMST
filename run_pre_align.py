@@ -19,6 +19,7 @@ def run_pre_align(
         local_max_offset=None,
         local_xy_range=None,
         local_invert_nonzero=False,
+        local_downsample=1,
         template=None,
         tm_threshold=(0, 0),
         tm_sigma=0.,
@@ -77,7 +78,8 @@ def run_pre_align(
                     mask_folder=local_mask_folder,
                     max_offset=local_max_offset,
                     xy_range=local_xy_range,
-                    invert_nonzero=local_invert_nonzero
+                    invert_nonzero=local_invert_nonzero,
+                    downsample=local_downsample
                 ),
                 tm=None if template is None else dict(
                     template=template,
@@ -168,6 +170,8 @@ if __name__ == '__main__':
                         help='Crop xy-range for computation: (x, y, width, height)')
     parser.add_argument('-liv', '--local_invert_nonzero', action='store_true',
                         help='The SIFT performs a lot better if the features of interest are bright')
+    parser.add_argument('-lds', '--local_downsample', type=int, default=1,
+                        help='Downsample the data before computing local alignment; only for SIFT; default=1 (no downsampling)')
     parser.add_argument('-tm', '--template', type=str,
                         help='Location of template tiff image. Enables template matching step if set')
     parser.add_argument('-tmt', '--tm_threshold', type=float, nargs=2, default=[0, 0],
@@ -215,6 +219,7 @@ if __name__ == '__main__':
     local_max_offset = args.local_max_offset
     local_xy_range = args.local_xy_range
     local_invert_nonzero = args.local_invert_nonzero
+    local_downsample = args.local_downsample
     template = args.template
     tm_threshold = args.tm_threshold
     tm_sigma = args.tm_sigma
@@ -262,6 +267,7 @@ if __name__ == '__main__':
         local_max_offset=local_max_offset,
         local_xy_range=local_xy_range,
         local_invert_nonzero=local_invert_nonzero,
+        local_downsample=local_downsample,
         template=template,
         tm_threshold=tm_threshold,
         tm_sigma=tm_sigma,

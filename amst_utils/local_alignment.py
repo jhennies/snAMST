@@ -26,6 +26,7 @@ def local_alignment(
         xy_range=None,
         invert_nonzero=False,
         mask_im_fp=None,
+        downsample=1,
         verbose=False
 ):
 
@@ -52,6 +53,7 @@ def local_alignment(
                 xy_range=xy_range,
                 invert_nonzero=invert_nonzero,
                 mask_im_fp=mask_im_fp,
+                downsample=downsample,
                 verbose=verbose
             )
             if verbose:
@@ -121,6 +123,7 @@ if __name__ == '__main__':
     local_max_offset = params['local']['max_offset']
     local_xy_range = params['local']['xy_range']
     local_invert_nonzero = params['local']['invert_nonzero']
+    local_downsample=params['local']['downsample']
     auto_pad = params['auto_pad']
     verbose = params['verbose']
 
@@ -144,5 +147,6 @@ if __name__ == '__main__':
         xy_range=local_xy_range,
         invert_nonzero=local_invert_nonzero,
         mask_im_fp=mask_im,
+        downsample=local_downsample,
         verbose=verbose
     )

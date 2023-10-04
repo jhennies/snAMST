@@ -90,11 +90,19 @@ def _sift(
         return_keypoints=False,
         auto_mask=None,
         mask=None,
+        downsample=1,
         verbose=False
 ):
 
     if sift_ocl is None and devicetype is None:
         raise RuntimeError('Either sift_ocl or devicetype need to be supplied')
+
+    if downsample > 1:
+        import cv2 as cv
+        image = cv.resize(image, (np.array(image.shape) / downsample).astype(int), interpolation=cv.INTER_LINEAR)
+        reference = cv.resize(reference, (np.array(reference.shape) / downsample).astype(int), interpolation=cv.INTER_LINEAR)
+        if mask is not None:
+            mask = cv.resize(mask, (np.array(mask.shape) / downsample).astype(int), interpolation=cv.INTER_LINEAR)
 
     if norm_quantiles is not None:
         if mask is not None:
@@ -159,6 +167,9 @@ def _sift(
     else:
         offset = (np.median(match[:, 1].x - match[:, 0].x), np.median(match[:, 1].y - match[:, 0].y))
 
+    if downsample > 1:
+        offset = tuple(np.array(offset) * downsample)
+
     if return_keypoints:
         return (float(offset[0]), float(offset[1])), keypoints_moving
     else:
@@ -184,6 +195,7 @@ def offset_with_sift(
         xy_range=None,
         invert_nonzero=False,
         mask_im_fp=None,
+        downsample=1,
         verbose=False
 ):
 
@@ -219,6 +231,7 @@ def offset_with_sift(
         norm_quantiles=norm_quantiles,
         auto_mask=auto_mask,
         mask=mask_im,
+        downsample=downsample,
         verbose=verbose
     )
     offsets = -np.array(offsets)
