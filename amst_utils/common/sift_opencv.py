@@ -139,6 +139,7 @@ def offset_with_sift(
         invert_nonzero=False,
         mask_im_fp=None,
         downsample=1,
+        bias=(0., 0.),
         verbose=False
 ):
 
@@ -180,6 +181,9 @@ def offset_with_sift(
     if max_offset is not None:
         if abs(offsets[0]) > max_offset[0] or abs(offsets[1]) > max_offset[1]:
             offsets = np.array([0., 0.])
+
+    # Apply bias
+    offsets = offsets + bias
 
     if return_bounds:
         return offsets.tolist(), bounds
