@@ -37,6 +37,12 @@ def _sift(
     if reference is None:
         return (0., 0.)
 
+    if auto_mask is not None:
+        assert mask is None, "Don't supply a mask when using auto-masking!"
+        mask = image > 0
+        if auto_mask > 0:
+            mask = discErosion(mask.astype('uint8'), auto_mask)
+
     if downsample > 1:
         image = cv.resize(image, (np.array(image.shape) / downsample).astype(int), interpolation=cv.INTER_LINEAR)
         reference = cv.resize(reference, (np.array(reference.shape) / downsample).astype(int), interpolation=cv.INTER_LINEAR)
@@ -64,8 +70,6 @@ def _sift(
     # Compute keypoints
     kp_img, des_img = sift.detectAndCompute(image, mask)
     kp_ref, des_ref = sift.detectAndCompute(reference, mask)
-
-    assert not auto_mask, 'Auto-mask is not implemented right now'
 
     # Compute matches
     if verbose:
