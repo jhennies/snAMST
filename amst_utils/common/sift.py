@@ -60,6 +60,24 @@ def _mask_keypoint_out_of_roi(image, kp, erode=10):
     return np.array(new_kp)
 
 
+def _equalize_shape(im0, im1):
+    if im0.shape != im1.shape:
+
+        final_shape = np.max((im0.shape, im1.shape), axis=0)
+        print(f'im0.shape = {im0.shape}')
+        print(f'im1.shape = {im1.shape}')
+        print(f'final_shape = {final_shape}')
+
+        tim0 = np.zeros(final_shape, dtype=im0.dtype)
+        tim0[:im0.shape[0], :im0.shape[1]] = im0
+        tim1 = np.zeros(final_shape, dtype=im1.dtype)
+        tim1[:im1.shape[0], :im1.shape[1]] = im1
+
+        return tim0, tim1
+    else:
+        return im0, im1
+
+
 def _sift(
         image,
         reference,
@@ -77,6 +95,9 @@ def _sift(
     if norm_quantiles is not None:
         image = _norm_8bit(image, norm_quantiles, ignore_zeros=auto_mask is not None)
         reference = _norm_8bit(reference, norm_quantiles, ignore_zeros=auto_mask is not None) if type(reference) == np.ndarray else reference
+
+    if type(reference) == np.ndarray:
+        image, reference = _equalize_shape(image, reference)
 
     # Initialize the SIFT
     if sift_ocl is None:
@@ -100,6 +121,8 @@ def _sift(
         print(f'type(reference) = {type(reference)}')
     if type(reference) == np.ndarray:
         print(f'reference.dtype = {reference.dtype}')
+        print(f'sift_ocl.shape = {sift_ocl.shape}')
+        print(f'reference.shape = {reference.shape}')
         keypoints_ref = sift_ocl.keypoints(reference)
         if auto_mask:
             keypoints_ref = _mask_keypoint_out_of_roi(reference, keypoints_ref)

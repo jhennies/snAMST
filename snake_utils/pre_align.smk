@@ -92,7 +92,7 @@ if use_tm:
             os.path.join(target_folder, "pre_align_cache", "offsets_tm", "{name}.json")
         threads: 1
         resources:
-            cpus=1, time_min=10, mem_mb=512
+            cpus=1, time_min=10, mem_mb=16384
         params:
             p='htc', gres=''
         script:
