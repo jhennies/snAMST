@@ -199,6 +199,9 @@ def offset_with_sift(
             bounds = get_bounds(im)
         ref_im = imread(ref_im_fp)
 
+    # TODO Apply the bounds to save computational time! Depending on how much zero padding is in the data, this is more
+    #   than substantial!
+
     if invert_nonzero:
         im = _invert_nonzero(im)
         ref_im = _invert_nonzero(ref_im)

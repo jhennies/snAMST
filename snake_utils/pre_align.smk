@@ -49,7 +49,7 @@ rule apply_translations:
         os.path.join(target_folder, "pre_align", "{name}")
     threads: 1
     resources:
-        cpus=1, time_min=10, mem_mb=4096
+        cpus=1, time_min=10, mem_mb=4000
     params:
         p='htc', gres=''
     script:
@@ -112,7 +112,7 @@ if use_local:
         threads: 1
         resources:
             gpu=1 if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 0,
-            cpus=1, time_min=10, mem_mb=16384
+            cpus=1, time_min=10, mem_mb=24000
         params:
             ref_im=get_ref_im,
             p='gpu' if params['local']['align_method'] == 'sift' and params['local']['device_type'] == 'GPU' else 'htc',

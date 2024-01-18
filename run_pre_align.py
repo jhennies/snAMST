@@ -25,6 +25,7 @@ def run_pre_align(
         combine_median=8,
         combine_sigma=8.,
         auto_pad=False,
+        subtract_running_average=False,
         align_params=None,
         batch_size=1,
         snake_kwargs=None,
@@ -83,6 +84,7 @@ def run_pre_align(
                 combine_median=combine_median,
                 combine_sigma=combine_sigma,
                 auto_pad=auto_pad,
+                subtract_running_average=subtract_running_average,
                 verbose=verbose
             )
         )
@@ -91,7 +93,8 @@ def run_pre_align(
     log_dir = os.path.join(target_folder, 'log')
     if verbose:
         print(f'log_dir = {log_dir}')
-    os.mkdir(log_dir)
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
     if cluster is not None:
         if cluster == 'slurm':
             snake_kwargs['cluster'] = (
@@ -107,6 +110,7 @@ def run_pre_align(
             snake_kwargs['nodes'] = cores
             snake_kwargs['restart_times'] = 0
             snake_kwargs['latency_wait'] = 3
+            snake_kwargs['max_jobs_per_second'] = 8
         else:
             raise RuntimeError(f'Not supporting cluster = {cluster}')
 
@@ -174,6 +178,8 @@ if __name__ == '__main__':
                         help='Gaussian smoothing of offsets when combining local and TM')
     parser.add_argument('-apd', '--auto_pad', action='store_true',
                         help='Automatically adjust canvas to match the final slice positions')
+    parser.add_argument('-sra', '--subtract_running_average', action='store_true',
+                        help='Activates subtraction of running average to avoid banana-effect')
     parser.add_argument('-ap', '--align_params', type=str, default=None,
                         help='Parameter file for the alignment methods.')
     parser.add_argument('-n', '--dryrun', action='store_true',
@@ -209,6 +215,7 @@ if __name__ == '__main__':
     combine_median = args.combine_median
     combine_sigma = args.combine_sigma
     auto_pad = args.auto_pad
+    subtract_running_average = args.subtract_running_average
     align_params = args.align_params
     dryrun = args.dryrun
     cores = args.cores
@@ -250,6 +257,7 @@ if __name__ == '__main__':
         combine_median=combine_median,
         combine_sigma=combine_sigma,
         auto_pad=auto_pad,
+        subtract_running_average=subtract_running_average,
         align_params=align_params,
         snake_kwargs=dict(
             resources={

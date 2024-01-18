@@ -119,3 +119,15 @@ def sequentialize_offsets(offsets):
 
     return np.array(seq_offsets)
 
+
+def apply_running_average(offsets, sigma=16.):
+
+    offsets = np.array(offsets)
+
+    off_gauss_x = gaussian_filter1d(offsets[:, 0], sigma)
+    off_gauss_y = gaussian_filter1d(offsets[:, 1], sigma)
+
+    offsets_x = offsets[:, 0] - off_gauss_x
+    offsets_y = offsets[:, 1] - off_gauss_y
+
+    return np.concatenate([offsets_x[:, None], offsets_y[:, None]], axis=1)
