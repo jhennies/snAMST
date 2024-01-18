@@ -96,6 +96,10 @@ def _sift(
         image = _norm_8bit(image, norm_quantiles, ignore_zeros=auto_mask is not None)
         reference = _norm_8bit(reference, norm_quantiles, ignore_zeros=auto_mask is not None) if type(reference) == np.ndarray else reference
 
+    if verbose:
+        print(f'image.shape = {image.shape}')
+        print(f'reference.shape = {reference.shape}')
+
     if type(reference) == np.ndarray:
         image, reference = _equalize_shape(image, reference)
 
