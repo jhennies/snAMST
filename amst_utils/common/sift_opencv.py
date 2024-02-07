@@ -1,7 +1,6 @@
 
 from tifffile import imread
 import numpy as np
-from silx.image import sift
 from .data import get_bounds
 from vigra.filters import discErosion
 
@@ -112,11 +111,15 @@ def _sift(
         add_to_factor += 0.1
         counter += 1
 
-    offset = np.median([
-        [kp_img[x.queryIdx].pt[0] - kp_ref[x.trainIdx].pt[0],
-         kp_img[x.queryIdx].pt[1] - kp_ref[x.trainIdx].pt[1]]
-        for x in final
-    ], axis=0)
+    if len(final) > 0:
+        offset = np.median([
+            [kp_img[x.queryIdx].pt[0] - kp_ref[x.trainIdx].pt[0],
+             kp_img[x.queryIdx].pt[1] - kp_ref[x.trainIdx].pt[1]]
+            for x in final
+        ], axis=0)
+    else:
+        print(f'Warning: Not enough matching keypoints found!')
+        offset = [0., 0.]
 
     if downsample > 1:
         offset = tuple(np.array(offset) * downsample)

@@ -2,7 +2,7 @@
 import os
 import snakemake
 from glob import glob
-from amst_utils.common.settings import set_run_info, set_params, get_params_fp, get_params
+from amst_utils.common.settings import set_run_info, set_params, get_params_fp, get_params, remove_run_info
 
 
 def run_pre_align(
@@ -133,6 +133,8 @@ def run_pre_align(
         snakemake.snakemake(
             os.path.join('snake_utils', 'pre_align_batch.smk'), **snake_kwargs
         )
+
+    remove_run_info()
 
 
 if __name__ == '__main__':
