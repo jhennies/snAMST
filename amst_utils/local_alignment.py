@@ -84,6 +84,29 @@ def local_alignment(
                 print(f'out = {out}')
             offset, bounds = out if save_bounds else (out, None)
 
+        elif align_method == 'elastix':
+
+            from amst_utils.common.elastix import offset_with_elastix
+            out = offset_with_elastix(
+                im_fp, ref_im_fp,
+                mask_range=mask_range,
+                thresh=thresh,
+                sigma=sigma,
+                norm_quantiles=norm_quantiles,
+                return_bounds=save_bounds,
+                auto_mask=auto_mask,
+                max_offset=max_offset,
+                xy_range=xy_range,
+                invert_nonzero=invert_nonzero,
+                mask_im_fp=mask_im_fp,
+                downsample=downsample,
+                bias=bias,
+                verbose=verbose
+            )
+            if verbose:
+                print(f'out = {out}')
+            offset, bounds = out if save_bounds else (out, None)
+
         elif align_method == 'xcorr':
 
             from amst_utils.common.xcorr import offsets_with_xcorr
