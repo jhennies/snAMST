@@ -80,11 +80,11 @@ def _invert_nonzero(img):
 
 def _big_jump_pre_fix(im, ref_im):
 
-    union = np.zeros(im.shape, type=bool)
+    union = np.zeros(im.shape, dtype=bool)
     union[im > 0] = True
     union[ref_im > 0] = True
 
-    intersection = np.zeros(im.shape, type=bool)
+    intersection = np.zeros(im.shape, dtype=bool)
     intersection[np.logical_and(im > 0, ref_im > 0)] = True
 
     iou = intersection.sum() / union.sum()
