@@ -1,7 +1,7 @@
 
 from tifffile import imread
 import numpy as np
-from .data import get_bounds
+from amst_utils.common.data import get_bounds
 from vigra.filters import discErosion
 
 from amst_utils.common.slice_pre_processing import preprocess_slice
@@ -69,7 +69,7 @@ def _elastix(
 
     offset = out_dict['translation_parameters']
 
-    return float(offset[0]), float(offset[1])
+    return float(offset[1]), float(offset[0])
 
 
 def _invert_nonzero(img):
@@ -97,12 +97,12 @@ def _big_jump_pre_fix(im, ref_im):
             ref_im, im,
             reference_mask=ref_im > 0,
             moving_mask=im > 0,
-            upsample_factor=10
+            upsample_factor=1
         )
 
         im = shift(im, np.round(offsets))
 
-        return offsets, im
+        return np.round(offsets), im
 
     return (0., 0.), im
 
@@ -150,10 +150,10 @@ def offset_with_elastix(
     im = preprocess_slice(im, sigma=sigma, mask_range=mask_range, thresh=thresh)
     ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
 
-    offsets_pre_fix, im = _big_jump_pre_fix(im, ref_im)
-
-    if verbose:
-        print(f'offsets_pre_fix = {offsets_pre_fix}')
+    # offsets_pre_fix, im = _big_jump_pre_fix(im, ref_im)
+    #
+    # if verbose:
+    #     print(f'offsets_pre_fix = {offsets_pre_fix}')
 
     offsets = _elastix(
         im, ref_im,
@@ -171,10 +171,33 @@ def offset_with_elastix(
     # Apply bias
     offsets = offsets + bias
 
-    # Add pre-fix offsets
-    offsets += offsets_pre_fix
+    # # Add pre-fix offsets
+    # offsets += offsets_pre_fix
 
     if return_bounds:
         return offsets.tolist(), bounds
     else:
         return offsets.tolist()
+
+
+if __name__ == '__main__':
+
+    offs = offset_with_elastix(
+        '/media/julian/Data/projects/kors/align/4T/subset_tiny/slice_06318_z=50.5361um.tif',
+        '/media/julian/Data/projects/kors/align/4T/subset_tiny/slice_00037_z=0.2880um.tif',
+        mask_range=None,
+        thresh=None,
+        sigma=0,
+        norm_quantiles=(0.1, 0.9),
+        return_bounds=False,
+        auto_mask=None,
+        max_offset=None,
+        xy_range=None,
+        invert_nonzero=False,
+        mask_im_fp=None,
+        downsample=1,
+        bias=(0., 0.),
+        verbose=True
+    )
+
+    print(f'offs = {offs}')
