@@ -91,6 +91,7 @@ def _big_jump_pre_fix(im, ref_im):
     if iou < 0.5:
         print(f'Fixing big jump!')
         from skimage.registration import phase_cross_correlation
+        from scipy.ndimage.interpolation import shift
 
         offsets = phase_cross_correlation(
             ref_im, im,
@@ -98,6 +99,8 @@ def _big_jump_pre_fix(im, ref_im):
             moving_mask=im > 0,
             upsample_factor=10
         )
+
+        im = shift(im, np.round(offsets))
 
         return offsets, im
 
@@ -148,6 +151,9 @@ def offset_with_elastix(
     ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
 
     offsets_pre_fix, im = _big_jump_pre_fix(im, ref_im)
+
+    if verbose:
+        print(f'offsets_pre_fix = {offsets_pre_fix}')
 
     offsets = _elastix(
         im, ref_im,
