@@ -78,6 +78,32 @@ def _invert_nonzero(img):
     return img
 
 
+def _big_jump_pre_fix(im, ref_im):
+
+    union = np.zeros(im.shape, type=bool)
+    union[im > 0] = True
+    union[ref_im > 0] = True
+
+    intersection = np.zeros(im.shape, type=bool)
+    intersection[np.logical_and(im > 0, ref_im > 0)] = True
+
+    iou = intersection.sum() / union.sum()
+    if iou < 0.5:
+        print(f'Fixing big jump!')
+        from skimage.registration import phase_cross_correlation
+
+        offsets = phase_cross_correlation(
+            ref_im, im,
+            reference_mask=ref_im > 0,
+            moving_mask=im > 0,
+            upsample_factor=10
+        )
+
+        return offsets, im
+
+    return (0., 0.), im
+
+
 def offset_with_elastix(
         im_fp, ref_im_fp,
         mask_range=None,
@@ -121,6 +147,8 @@ def offset_with_elastix(
     im = preprocess_slice(im, sigma=sigma, mask_range=mask_range, thresh=thresh)
     ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
 
+    offsets_pre_fix, im = _big_jump_pre_fix(im, ref_im)
+
     offsets = _elastix(
         im, ref_im,
         norm_quantiles=norm_quantiles,
@@ -136,6 +164,9 @@ def offset_with_elastix(
 
     # Apply bias
     offsets = offsets + bias
+
+    # Add pre-fix offsets
+    offsets += offsets_pre_fix
 
     if return_bounds:
         return offsets.tolist(), bounds
