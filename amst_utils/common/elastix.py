@@ -104,7 +104,7 @@ def _big_jump_pre_fix(im, ref_im, mask_im):
         if mask_im is not None:
             mask_im = shift(mask_im, np.round(offsets))
 
-        return -np.round([offsets[1], offsets[0]]), im, mask_im
+        return np.round([offsets[1], offsets[0]]), im, mask_im
 
     return (0., 0.), im, mask_im
 
