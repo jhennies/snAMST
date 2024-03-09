@@ -100,9 +100,9 @@ def _big_jump_pre_fix(im, ref_im):
             upsample_factor=1
         )
 
-        im = shift(im, np.round(offsets))
+        im = shift(im, -np.round(offsets))
 
-        return np.round(offsets), im
+        return -np.round([offsets[1], offsets[0]]), im
 
     return (0., 0.), im
 
@@ -172,7 +172,7 @@ def offset_with_elastix(
     offsets = offsets + bias
 
     # Add pre-fix offsets
-    offsets -= offsets_pre_fix
+    offsets += offsets_pre_fix
 
     if return_bounds:
         return offsets.tolist(), bounds
