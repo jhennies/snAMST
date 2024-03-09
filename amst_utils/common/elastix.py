@@ -154,9 +154,9 @@ def offset_with_elastix(
 
     offsets_pre_fix, im, mask_im = _big_jump_pre_fix(im, ref_im, mask_im)
 
-    import tifffile
-    tifffile.imwrite('/media/julian/Data/tmp/im.tif', im)
-    tifffile.imwrite('/media/julian/Data/tmp/ref_im.tif', ref_im)
+    # import tifffile
+    # tifffile.imwrite('/media/julian/Data/tmp/im.tif', im)
+    # tifffile.imwrite('/media/julian/Data/tmp/ref_im.tif', ref_im)
 
     if verbose:
         print(f'offsets_pre_fix = {offsets_pre_fix}')
