@@ -150,10 +150,10 @@ def offset_with_elastix(
     im = preprocess_slice(im, sigma=sigma, mask_range=mask_range, thresh=thresh)
     ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
 
-    # offsets_pre_fix, im = _big_jump_pre_fix(im, ref_im)
-    #
-    # if verbose:
-    #     print(f'offsets_pre_fix = {offsets_pre_fix}')
+    offsets_pre_fix, im = _big_jump_pre_fix(im, ref_im)
+
+    if verbose:
+        print(f'offsets_pre_fix = {offsets_pre_fix}')
 
     offsets = _elastix(
         im, ref_im,
@@ -171,8 +171,8 @@ def offset_with_elastix(
     # Apply bias
     offsets = offsets + bias
 
-    # # Add pre-fix offsets
-    # offsets += offsets_pre_fix
+    # Add pre-fix offsets
+    offsets -= offsets_pre_fix
 
     if return_bounds:
         return offsets.tolist(), bounds
