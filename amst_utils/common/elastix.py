@@ -78,7 +78,7 @@ def _invert_nonzero(img):
     return img
 
 
-def _big_jump_pre_fix(im, ref_im):
+def _big_jump_pre_fix(im, ref_im, mask_im):
 
     union = np.zeros(im.shape, dtype=bool)
     union[im > 0] = True
@@ -100,11 +100,13 @@ def _big_jump_pre_fix(im, ref_im):
             upsample_factor=1
         )
 
-        im = shift(im, -np.round(offsets))
+        im = shift(im, np.round(offsets))
+        if mask_im is not None:
+            mask_im = shift(mask_im, np.round(offsets))
 
-        return -np.round([offsets[1], offsets[0]]), im
+        return -np.round([offsets[1], offsets[0]]), im, mask_im
 
-    return (0., 0.), im
+    return (0., 0.), im, mask_im
 
 
 def offset_with_elastix(
@@ -150,7 +152,11 @@ def offset_with_elastix(
     im = preprocess_slice(im, sigma=sigma, mask_range=mask_range, thresh=thresh)
     ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
 
-    offsets_pre_fix, im = _big_jump_pre_fix(im, ref_im)
+    offsets_pre_fix, im, mask_im = _big_jump_pre_fix(im, ref_im, mask_im)
+
+    import tifffile
+    tifffile.imwrite('/media/julian/Data/tmp/im.tif', im)
+    tifffile.imwrite('/media/julian/Data/tmp/ref_im.tif', ref_im)
 
     if verbose:
         print(f'offsets_pre_fix = {offsets_pre_fix}')
@@ -190,7 +196,7 @@ if __name__ == '__main__':
         sigma=0,
         norm_quantiles=(0.1, 0.9),
         return_bounds=False,
-        auto_mask=None,
+        auto_mask=True,
         max_offset=None,
         xy_range=None,
         invert_nonzero=False,
