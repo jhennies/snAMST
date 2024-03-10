@@ -69,7 +69,7 @@ def _elastix(
 
     offset = out_dict['translation_parameters']
 
-    return float(offset[1]), float(offset[0])
+    return float(offset[0]), float(offset[1])
 
 
 def _invert_nonzero(img):
