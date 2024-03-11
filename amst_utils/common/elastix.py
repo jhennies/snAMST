@@ -37,11 +37,15 @@ def _elastix(
     if reference is None:
         return (0., 0.)
 
+    use_auto_mask = False
     if auto_mask is not None:
-        assert mask is None, "Don't supply a mask when using auto-masking!"
-        mask = image > 0
-        if auto_mask > 0:
-            mask = discErosion(mask.astype('uint8'), auto_mask)
+        use_auto_mask = True
+        # assert mask is None, "Don't supply a mask when using auto-masking!"
+        # mask_im = image > 0
+        # mask_ref = reference > 0
+        # mask = np.logical_and(mask_im, mask_ref)
+        # if auto_mask > 0:
+        #     mask = discErosion(mask.astype('uint8'), auto_mask)
 
     if downsample > 1:
         image = cv.resize(image, (np.array(image.shape) / downsample).astype(int), interpolation=cv.INTER_LINEAR)
@@ -63,6 +67,7 @@ def _elastix(
 
     out_dict = register_with_elastix(
         reference, image,
+        auto_mask=use_auto_mask,
         transform='translation',
         verbose=verbose
     )
