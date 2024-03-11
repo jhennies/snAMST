@@ -21,6 +21,7 @@ def run_pre_align(
         local_invert_nonzero=False,
         local_downsample=1,
         local_bias=(0., 0.),
+        local_big_jump_prefix=False,
         template=None,
         tm_threshold=(0, 0),
         tm_sigma=0.,
@@ -81,7 +82,8 @@ def run_pre_align(
                     xy_range=local_xy_range,
                     invert_nonzero=local_invert_nonzero,
                     downsample=local_downsample,
-                    bias=local_bias
+                    bias=local_bias,
+                    big_jump_prefix=local_big_jump_prefix
                 ),
                 tm=None if template is None else dict(
                     template=template,
@@ -180,6 +182,9 @@ if __name__ == '__main__':
     parser.add_argument('-lbs', '--local_bias', type=float, nargs=2, default=(0., 0.),
                         metavar=('X', 'Y'),
                         help='Bias for local alignment; only for SIFT; default=(0., 0.)')
+    parser.add_argument('-lpf', '--local_big_jump_prefix', action='store_true',
+                        help='Activate a cross-correlation-based pre-fixing if the non-zero regions of adjacent slices'
+                             'overlap by less than 50 % (IoU)')
     parser.add_argument('-tm', '--template', type=str,
                         help='Location of template tiff image. Enables template matching step if set')
     parser.add_argument('-tmt', '--tm_threshold', type=float, nargs=2, default=[0, 0],
@@ -229,6 +234,7 @@ if __name__ == '__main__':
     local_invert_nonzero = args.local_invert_nonzero
     local_downsample = args.local_downsample
     local_bias = args.local_bias
+    local_big_jump_prefix = args.local_big_jump_prefix
     template = args.template
     tm_threshold = args.tm_threshold
     tm_sigma = args.tm_sigma
@@ -278,6 +284,7 @@ if __name__ == '__main__':
         local_invert_nonzero=local_invert_nonzero,
         local_downsample=local_downsample,
         local_bias=local_bias,
+        local_big_jump_prefix=local_big_jump_prefix,
         template=template,
         tm_threshold=tm_threshold,
         tm_sigma=tm_sigma,

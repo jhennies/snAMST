@@ -28,6 +28,7 @@ def local_alignment(
         mask_im_fp=None,
         downsample=1,
         bias=(0., 0.),
+        big_jump_prefix=False,
         verbose=False
 ):
 
@@ -101,6 +102,7 @@ def local_alignment(
                 mask_im_fp=mask_im_fp,
                 downsample=downsample,
                 bias=bias,
+                big_jump_prefix=big_jump_prefix,
                 verbose=verbose
             )
             if verbose:
@@ -172,6 +174,7 @@ if __name__ == '__main__':
     local_invert_nonzero = params['local']['invert_nonzero']
     local_downsample = params['local']['downsample']
     local_bias = params['local']['bias']
+    local_big_jump_prefix = params['local']['big_jump_prefix']
     auto_pad = params['auto_pad']
     verbose = params['verbose']
 
@@ -197,5 +200,6 @@ if __name__ == '__main__':
         mask_im_fp=mask_im,
         downsample=local_downsample,
         bias=local_bias,
+        big_jump_prefix=local_big_jump_prefix,
         verbose=verbose
     )

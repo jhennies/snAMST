@@ -123,6 +123,7 @@ def offset_with_elastix(
         mask_im_fp=None,
         downsample=1,
         bias=(0., 0.),
+        big_jump_prefix=False,
         verbose=False
 ):
 
@@ -152,14 +153,11 @@ def offset_with_elastix(
     im = preprocess_slice(im, sigma=sigma, mask_range=mask_range, thresh=thresh)
     ref_im = preprocess_slice(ref_im, sigma=sigma, mask_range=mask_range, thresh=thresh)
 
-    offsets_pre_fix, im, mask_im = _big_jump_pre_fix(im, ref_im, mask_im)
+    if big_jump_prefix:
+        offsets_pre_fix, im, mask_im = _big_jump_pre_fix(im, ref_im, mask_im)
 
-    # import tifffile
-    # tifffile.imwrite('/media/julian/Data/tmp/im.tif', im)
-    # tifffile.imwrite('/media/julian/Data/tmp/ref_im.tif', ref_im)
-
-    if verbose:
-        print(f'offsets_pre_fix = {offsets_pre_fix}')
+        if verbose:
+            print(f'offsets_pre_fix = {offsets_pre_fix}')
 
     offsets = _elastix(
         im, ref_im,
@@ -177,8 +175,9 @@ def offset_with_elastix(
     # Apply bias
     offsets = offsets + bias
 
-    # Add pre-fix offsets
-    offsets += offsets_pre_fix
+    if big_jump_prefix:
+        # Add pre-fix offsets
+        offsets += offsets_pre_fix
 
     if return_bounds:
         return offsets.tolist(), bounds
